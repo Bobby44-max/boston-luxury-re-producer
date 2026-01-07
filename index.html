@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boston Luxury RE Producer | 2026 Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.css">
+    <style>
+        :root {
+            --off-black: #0A0A0A;
+            --editorial-white: #FBF9F7;
+            --accent-blue: #3A5BFF;
+            --warm-gray: #D7D3CD;
+            --chart-red: #E4572E;
+            --highlight-yellow: #F4BE3A;
+        }
+        body { 
+            font-family: 'Geist', sans-serif; 
+            background-color: var(--editorial-white);
+            color: var(--off-black);
+            overflow-x: hidden;
+        }
+        h1, h2, h3, .serif { 
+            font-family: 'Fraunces', serif; 
+            letter-spacing: -0.02em;
+        }
+        
+        html { scroll-behavior: smooth; }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Advanced Data Visualization Animations */
+        @keyframes growUp {
+            from { height: 0; opacity: 0; }
+            to { height: var(--target-height); opacity: 1; }
+        }
+        
+        @keyframes scaleIn {
+            from { transform: scale(0.92); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .bar-animate {
+            animation: growUp 1.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        .stat-card-animate {
+            animation: scaleIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards, fadeIn 0.9s ease-out forwards;
+        }
+
+        .fade-in-delayed {
+            opacity: 0;
+            animation: fadeIn 1.5s ease-out 0.6s forwards;
+        }
+
+        /* LUXURY STAT CARD REFINEMENT */
+        .luxury-card {
+            position: relative;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.01);
+            transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.5s ease;
+        }
+        
+        .luxury-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(-45deg, 
+                rgba(58, 91, 255, 0.12), 
+                rgba(244, 190, 58, 0.06), 
+                rgba(228, 87, 46, 0.1),
+                rgba(58, 91, 255, 0.08)
+            );
+            background-size: 400% 400%;
+            opacity: 0;
+            transition: opacity 1s ease;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .luxury-card:hover::before {
+            opacity: 1;
+            animation: gradientShift 12s ease infinite;
+        }
+
+        .luxury-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* RADIANT GLASS PERIMETER */
+        .glass-perimeter {
+            position: relative;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 
+                0 20px 50px rgba(0, 0, 0, 0.05),
+                inset 0 0 20px rgba(255, 255, 255, 0.2);
+            transition: all 0.5s ease;
+        }
+
+        .radiant-pulse::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            padding: 2px;
+            border-radius: inherit;
+            background: linear-gradient(
+                45deg, 
+                var(--accent-blue), 
+                #00D1FF, 
+                #7000FF, 
+                var(--accent-blue)
+            );
+            background-size: 300% 300%;
+            -webkit-mask: 
+                linear-gradient(#fff 0 0) content-box, 
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            animation: gradientMove 4s linear infinite, perimeterPulse 2s ease-in-out infinite alternate;
+            z-index: 1;
+        }
+
+        .radiant-pulse::after {
+            content: '';
+            position: absolute;
+            inset: -15px;
+            z-index: -1;
+            background: linear-gradient(45deg, var(--accent-blue), #00D1FF, var(--accent-blue));
+            background-size: 200% 200%;
+            border-radius: inherit;
+            opacity: 0.1;
+            filter: blur(30px);
+            animation: perimeterPulse 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes perimeterPulse {
+            0% { opacity: 0.2; transform: scale(1); }
+            100% { opacity: 0.6; transform: scale(1.005); }
+        }
+
+        .nav-link-active {
+            position: relative;
+            color: var(--accent-blue) !important;
+        }
+        .nav-link-active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            background: var(--accent-blue);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-blue);
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "react": "https://esm.sh/react@^19.2.3",
+    "react/": "https://esm.sh/react@^19.2.3/"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body>
+    <div id="root"></div>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>
