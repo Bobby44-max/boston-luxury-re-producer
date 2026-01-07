@@ -1,6 +1,6 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
-import { VideoPackage } from "../types";
+import { VideoPackage, ContentSuiteResult, CompetitorIQResult, SalesAceResult, SocialPostResult, ProposalResult } from "../types";
 
 // ============================================
 // KNOWLEDGE BASE: Modern Agent's Real Estate Playbook (115 Sources)
@@ -172,4 +172,235 @@ export async function generateVeoVideo(base64Image: string, prompt: string, rati
   const response = await fetch(`${downloadLink}&key=${process.env.API_KEY}`);
   const blob = await response.blob();
   return URL.createObjectURL(blob);
+}
+
+// ============================================
+// CONTENT SUITE - Content Multiplier
+// ============================================
+export async function generateContentSuite(topic: string): Promise<ContentSuiteResult> {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+
+  const response = await ai.models.generateContent({
+    model: 'gemini-3-pro-preview',
+    contents: `Topic: ${topic}
+
+Generate a complete professional content suite for Boston luxury real estate marketing:
+1. Video Script - 90 seconds with hook, value, CTA
+2. Slide Deck Outline - 10 slides with speaker notes
+3. Infographic Structure - 5 data points with context
+4. Podcast Script - 5 minute engaging episode
+5. Quiz Questions - 5 engaging questions about the topic
+6. Data Table - Key market statistics
+
+Make all content specific to Boston luxury real estate market.`,
+    config: {
+      systemInstruction: `You are a content strategist for Boston luxury real estate. ${PLAYBOOK_KNOWLEDGE}`,
+      responseMimeType: "application/json",
+      tools: [{ googleSearch: {} }],
+      responseSchema: {
+        type: Type.OBJECT,
+        properties: {
+          videoScript: { type: Type.STRING, description: "90-second video script with timestamps" },
+          slideDeck: { type: Type.STRING, description: "10 slides with speaker notes" },
+          infographic: { type: Type.STRING, description: "5 data points with visual descriptions" },
+          podcastScript: { type: Type.STRING, description: "5-minute podcast episode script" },
+          quizQuestions: { type: Type.ARRAY, items: { type: Type.STRING }, description: "5 quiz questions" },
+          dataTable: { type: Type.STRING, description: "Market data table in markdown format" }
+        },
+        required: ["videoScript", "slideDeck", "infographic", "podcastScript", "quizQuestions", "dataTable"]
+      }
+    }
+  });
+
+  const text = response.text;
+  if (!text) throw new Error("No response from AI");
+  return JSON.parse(text.trim());
+}
+
+// ============================================
+// COMPETITOR IQ - Competitor Analysis
+// ============================================
+export async function generateCompetitorAnalysis(
+  myCompany: string,
+  competitors: string[]
+): Promise<CompetitorIQResult> {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+
+  const response = await ai.models.generateContent({
+    model: 'gemini-3-pro-preview',
+    contents: `My Company: ${myCompany}
+Competitors: ${competitors.join(', ')}
+
+Generate a comprehensive competitor analysis for a Boston luxury real estate agency:
+1. Strengths/Weaknesses Matrix - Compare all companies
+2. Pricing/Positioning Analysis - How each positions in market
+3. Messaging Analysis - Brand voice and key messages
+4. Counter-Positioning Strategy - How to differentiate
+5. Sales Battle Card - Kill points and rebuttals`,
+    config: {
+      systemInstruction: `You are a competitive intelligence analyst for luxury real estate. Research competitors thoroughly using web search. ${PLAYBOOK_KNOWLEDGE}`,
+      responseMimeType: "application/json",
+      tools: [{ googleSearch: {} }],
+      responseSchema: {
+        type: Type.OBJECT,
+        properties: {
+          strengthsWeaknesses: { type: Type.STRING, description: "Matrix comparing all companies" },
+          pricingAnalysis: { type: Type.STRING, description: "Pricing and positioning analysis" },
+          messagingAnalysis: { type: Type.STRING, description: "Brand messaging analysis" },
+          counterPositioning: { type: Type.STRING, description: "Differentiation strategy" },
+          battleCard: { type: Type.STRING, description: "Sales battle card with kill points" }
+        },
+        required: ["strengthsWeaknesses", "pricingAnalysis", "messagingAnalysis", "counterPositioning", "battleCard"]
+      }
+    }
+  });
+
+  const text = response.text;
+  if (!text) throw new Error("No response from AI");
+  return JSON.parse(text.trim());
+}
+
+// ============================================
+// SALES ACE - Objection Handling
+// ============================================
+export async function generateSalesAce(
+  productName: string,
+  industry: string,
+  dealSize: string,
+  valueProps: string,
+  competitors: string
+): Promise<SalesAceResult> {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+
+  const response = await ai.models.generateContent({
+    model: 'gemini-3-pro-preview',
+    contents: `Product/Service: ${productName}
+Industry: ${industry}
+Deal Size: ${dealSize}
+Value Propositions: ${valueProps}
+Competitors: ${competitors}
+
+Generate comprehensive sales enablement materials:
+1. 15 Objection Handling Frameworks (Acknowledge, Clarify, Respond, Confirm, Advance)
+2. Competitor Battlecard with "When they say X, we say Y" scripts
+3. 9 Voicemail Scripts (3 cold, 3 warm, 3 stalled)
+4. 5 Role-Play Scenarios with escalating difficulty
+5. Quick Reference Card with top 10 objections and one-liners`,
+    config: {
+      systemInstruction: `You are an expert sales strategist for luxury real estate. Create actionable, field-ready sales materials. ${PLAYBOOK_KNOWLEDGE}`,
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: Type.OBJECT,
+        properties: {
+          objectionFrameworks: { type: Type.STRING, description: "15 detailed objection frameworks" },
+          competitorBattlecard: { type: Type.STRING, description: "Competitor rebuttals and kill points" },
+          voicemailScripts: { type: Type.STRING, description: "9 voicemail scripts by category" },
+          rolePlayScenarios: { type: Type.STRING, description: "5 role-play scenarios" },
+          quickReferenceCard: { type: Type.STRING, description: "Top 10 objections cheat sheet" }
+        },
+        required: ["objectionFrameworks", "competitorBattlecard", "voicemailScripts", "rolePlayScenarios", "quickReferenceCard"]
+      }
+    }
+  });
+
+  const text = response.text;
+  if (!text) throw new Error("No response from AI");
+  return JSON.parse(text.trim());
+}
+
+// ============================================
+// SOCIAL POSTS - Video Script & Post Generator
+// ============================================
+export async function generateSocialPost(
+  topicIdea: string,
+  postStyle: string,
+  industry: string,
+  videoStyle: string,
+  ctaGoal: string
+): Promise<SocialPostResult> {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+
+  const response = await ai.models.generateContent({
+    model: 'gemini-3-pro-preview',
+    contents: `Topic: ${topicIdea}
+Post Style: ${postStyle}
+Industry: ${industry}
+Video Style: ${videoStyle}
+CTA Goal: ${ctaGoal}
+
+Generate:
+1. 8-Second Video Script with HOOK (0-2s), VALUE (2-6s), CTA (6-8s), and ON-SCREEN TEXT
+2. Detailed Gemini/Veo Video Prompt with visual style, scene breakdown, audio, text overlays
+3. LinkedIn Post with hook, paragraphs, CTA, and 5 hashtags`,
+    config: {
+      systemInstruction: `You are a social media content creator for luxury real estate. Create scroll-stopping content. Brand colors: Dark background (#0A0A0F), cyan (#00D4FF). ${PLAYBOOK_KNOWLEDGE}`,
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: Type.OBJECT,
+        properties: {
+          videoScript: { type: Type.STRING, description: "8-second video script with timing" },
+          geminiPrompt: { type: Type.STRING, description: "Detailed video generation prompt" },
+          linkedinPost: { type: Type.STRING, description: "LinkedIn post with hashtags" },
+          characterCount: { type: Type.NUMBER, description: "Character count of LinkedIn post" }
+        },
+        required: ["videoScript", "geminiPrompt", "linkedinPost", "characterCount"]
+      }
+    }
+  });
+
+  const text = response.text;
+  if (!text) throw new Error("No response from AI");
+  return JSON.parse(text.trim());
+}
+
+// ============================================
+// PROPOSALS - Business Proposal Generator
+// ============================================
+export async function generateProposal(
+  prospectName: string,
+  companyName: string,
+  industry: string,
+  painPoints: string,
+  proposedSolution: string,
+  pricing: string
+): Promise<ProposalResult> {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+
+  const response = await ai.models.generateContent({
+    model: 'gemini-3-pro-preview',
+    contents: `Prospect: ${prospectName}
+Company: ${companyName}
+Industry: ${industry}
+Pain Points: ${painPoints}
+Proposed Solution: ${proposedSolution}
+Pricing: ${pricing}
+
+Generate a comprehensive business proposal:
+1. Executive Summary - High-level overview
+2. Problem Statement - Client's pain points
+3. Scope of Work - Services/products to deliver
+4. Timeline - Implementation schedule
+5. Investment Breakdown - Detailed costs
+6. Next Steps - Actions to move forward`,
+    config: {
+      systemInstruction: `You are an expert business proposal writer for luxury real estate services. Create professional, persuasive proposals.`,
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: Type.OBJECT,
+        properties: {
+          executiveSummary: { type: Type.STRING, description: "Executive summary" },
+          problemStatement: { type: Type.STRING, description: "Problem statement" },
+          scopeOfWork: { type: Type.STRING, description: "Scope of work" },
+          timeline: { type: Type.STRING, description: "Implementation timeline" },
+          investmentBreakdown: { type: Type.STRING, description: "Investment breakdown" },
+          nextSteps: { type: Type.STRING, description: "Next steps" }
+        },
+        required: ["executiveSummary", "problemStatement", "scopeOfWork", "timeline", "investmentBreakdown", "nextSteps"]
+      }
+    }
+  });
+
+  const text = response.text;
+  if (!text) throw new Error("No response from AI");
+  return JSON.parse(text.trim());
 }

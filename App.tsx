@@ -1,10 +1,28 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { generateVideoPackage, generateVeoVideo } from './services/geminiService';
-import { VideoPackage, AppStatus, ToolMode } from './types';
+import {
+  generateVideoPackage,
+  generateVeoVideo,
+  generateContentSuite,
+  generateCompetitorAnalysis,
+  generateSalesAce,
+  generateSocialPost,
+  generateProposal
+} from './services/geminiService';
+import {
+  VideoPackage,
+  AppStatus,
+  ToolMode,
+  ContentSuiteResult,
+  CompetitorIQResult,
+  SalesAceResult,
+  SocialPostResult,
+  ProposalResult
+} from './types';
 import {
   Search, Film, Clipboard, Sparkles, Mic, Image as ImageIcon,
   MicOff, Loader2, ArrowRight, TrendingUp, Zap, Boxes, FileText, Layout, Plus, Minus, ChevronRight,
-  Copy, Check, Play, X, MapPin, Building2, TreePine, Waves, GraduationCap, Home, DollarSign, Clock, Users
+  Copy, Check, Play, X, MapPin, Building2, TreePine, Waves, GraduationCap, Home, DollarSign, Clock, Users,
+  Target, Shield, MessageSquare, FileCheck, Linkedin, Video, BarChart3, Swords
 } from 'lucide-react';
 import { GoogleGenAI, Modality, LiveServerMessage } from "@google/genai";
 
@@ -157,6 +175,42 @@ const App: React.FC = () => {
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [selectedNeighborhood, setSelectedNeighborhood] = useState<string | null>(null);
 
+  // Content Suite State
+  const [contentSuiteResult, setContentSuiteResult] = useState<ContentSuiteResult | null>(null);
+  const [contentSuiteTab, setContentSuiteTab] = useState<'video' | 'slides' | 'infographic' | 'podcast' | 'quiz' | 'data'>('video');
+
+  // Competitor IQ State
+  const [companyName, setCompanyName] = useState('');
+  const [competitors, setCompetitors] = useState(['', '', '']);
+  const [competitorResult, setCompetitorResult] = useState<CompetitorIQResult | null>(null);
+  const [competitorTab, setCompetitorTab] = useState<'matrix' | 'pricing' | 'messaging' | 'counter' | 'battlecard'>('matrix');
+
+  // Sales Ace State
+  const [salesProduct, setSalesProduct] = useState('');
+  const [salesIndustry, setSalesIndustry] = useState('Luxury Real Estate');
+  const [salesDealSize, setSalesDealSize] = useState('$50K-$100K');
+  const [salesValueProps, setSalesValueProps] = useState('');
+  const [salesCompetitors, setSalesCompetitors] = useState('');
+  const [salesResult, setSalesResult] = useState<SalesAceResult | null>(null);
+  const [salesTab, setSalesTab] = useState<'objections' | 'battlecard' | 'voicemail' | 'roleplay' | 'cheatsheet'>('objections');
+
+  // Social Posts State
+  const [socialTopic, setSocialTopic] = useState('');
+  const [socialPostStyle, setSocialPostStyle] = useState('Insight');
+  const [socialVideoStyle, setSocialVideoStyle] = useState('Talking Head');
+  const [socialCtaGoal, setSocialCtaGoal] = useState('Engagement');
+  const [socialResult, setSocialResult] = useState<SocialPostResult | null>(null);
+
+  // Proposals State
+  const [prospectName, setProspectName] = useState('');
+  const [prospectCompany, setProspectCompany] = useState('');
+  const [prospectIndustry, setProspectIndustry] = useState('');
+  const [prospectPainPoints, setProspectPainPoints] = useState('');
+  const [proposedSolution, setProposedSolution] = useState('');
+  const [proposalPricing, setProposalPricing] = useState('');
+  const [proposalResult, setProposalResult] = useState<ProposalResult | null>(null);
+  const [proposalTab, setProposalTab] = useState<'summary' | 'problem' | 'scope' | 'timeline' | 'investment' | 'next'>('summary');
+
   const audioContextRef = useRef<AudioContext | null>(null);
   const outputAudioContextRef = useRef<AudioContext | null>(null);
   const nextStartTimeRef = useRef(0);
@@ -189,6 +243,86 @@ const App: React.FC = () => {
 
   const scrollToProduction = () => {
     document.getElementById('production-desk')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // Content Suite Handler
+  const handleContentSuiteSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!topic.trim()) return;
+    setStatus(AppStatus.LOADING);
+    setContentSuiteResult(null);
+    try {
+      const data = await generateContentSuite(topic);
+      setContentSuiteResult(data);
+      setStatus(AppStatus.SUCCESS);
+    } catch (err) {
+      console.error(err);
+      setStatus(AppStatus.ERROR);
+    }
+  };
+
+  // Competitor IQ Handler
+  const handleCompetitorSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!companyName.trim() || !competitors.some(c => c.trim())) return;
+    setStatus(AppStatus.LOADING);
+    setCompetitorResult(null);
+    try {
+      const data = await generateCompetitorAnalysis(companyName, competitors.filter(c => c.trim()));
+      setCompetitorResult(data);
+      setStatus(AppStatus.SUCCESS);
+    } catch (err) {
+      console.error(err);
+      setStatus(AppStatus.ERROR);
+    }
+  };
+
+  // Sales Ace Handler
+  const handleSalesAceSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!salesProduct.trim()) return;
+    setStatus(AppStatus.LOADING);
+    setSalesResult(null);
+    try {
+      const data = await generateSalesAce(salesProduct, salesIndustry, salesDealSize, salesValueProps, salesCompetitors);
+      setSalesResult(data);
+      setStatus(AppStatus.SUCCESS);
+    } catch (err) {
+      console.error(err);
+      setStatus(AppStatus.ERROR);
+    }
+  };
+
+  // Social Posts Handler
+  const handleSocialPostSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!socialTopic.trim()) return;
+    setStatus(AppStatus.LOADING);
+    setSocialResult(null);
+    try {
+      const data = await generateSocialPost(socialTopic, socialPostStyle, 'Luxury Real Estate', socialVideoStyle, socialCtaGoal);
+      setSocialResult(data);
+      setStatus(AppStatus.SUCCESS);
+    } catch (err) {
+      console.error(err);
+      setStatus(AppStatus.ERROR);
+    }
+  };
+
+  // Proposal Handler
+  const handleProposalSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!prospectName.trim() || !prospectCompany.trim()) return;
+    setStatus(AppStatus.LOADING);
+    setProposalResult(null);
+    try {
+      const data = await generateProposal(prospectName, prospectCompany, prospectIndustry, prospectPainPoints, proposedSolution, proposalPricing);
+      setProposalResult(data);
+      setStatus(AppStatus.SUCCESS);
+    } catch (err) {
+      console.error(err);
+      setStatus(AppStatus.ERROR);
+    }
   };
 
   const handleVeoSubmit = async () => {
@@ -358,19 +492,24 @@ const App: React.FC = () => {
             <p className="text-[#0A0A0A]/40 uppercase tracking-[0.4em] font-black text-[10px]">Executive tools for high-production results</p>
         </div>
 
-        <div className="flex flex-wrap justify-center gap-4 md:gap-6 mb-16">
+        <div className="flex flex-wrap justify-center gap-3 md:gap-4 mb-16">
           {[
-            { id: 'PRODUCER', icon: <Boxes className="w-4 h-4" /> },
-            { id: 'LIVE_CONSULTANT', icon: <Mic className="w-4 h-4" /> },
-            { id: 'VEO_ANIMATOR', icon: <Film className="w-4 h-4" /> }
+            { id: 'PRODUCER', icon: <Boxes className="w-4 h-4" />, label: 'Producer' },
+            { id: 'LIVE_CONSULTANT', icon: <Mic className="w-4 h-4" />, label: 'Live' },
+            { id: 'VEO_ANIMATOR', icon: <Film className="w-4 h-4" />, label: 'Veo' },
+            { id: 'CONTENT_SUITE', icon: <Layout className="w-4 h-4" />, label: 'Content' },
+            { id: 'COMPETITOR_IQ', icon: <Target className="w-4 h-4" />, label: 'Intel' },
+            { id: 'SALES_ACE', icon: <Swords className="w-4 h-4" />, label: 'Sales' },
+            { id: 'SOCIAL_POSTS', icon: <Linkedin className="w-4 h-4" />, label: 'Social' },
+            { id: 'PROPOSALS', icon: <FileCheck className="w-4 h-4" />, label: 'Proposals' }
           ].map((t) => (
             <button
               key={t.id}
               onClick={() => setMode(t.id as ToolMode)}
-              className={`px-8 py-4 rounded-full text-[10px] font-black uppercase tracking-[0.4em] transition-all flex items-center gap-3 shadow-md active:scale-95 ${mode === t.id ? 'bg-[#0A0A0A] text-white scale-105' : 'bg-white border border-[#D7D3CD]/50 text-[#0A0A0A]/60 hover:text-[#0A0A0A]'}`}
+              className={`px-5 py-3 md:px-6 md:py-4 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] md:tracking-[0.3em] transition-all flex items-center gap-2 shadow-md active:scale-95 ${mode === t.id ? 'bg-[#0A0A0A] text-white scale-105' : 'bg-white border border-[#D7D3CD]/50 text-[#0A0A0A]/60 hover:text-[#0A0A0A]'}`}
             >
               {t.icon}
-              {t.id.replace('_', ' ')}
+              {t.label}
             </button>
           ))}
         </div>
@@ -546,6 +685,201 @@ const App: React.FC = () => {
                   </div>
                 )}
               </div>
+            </div>
+          )}
+
+          {/* CONTENT SUITE */}
+          {mode === 'CONTENT_SUITE' && (
+            <div className="p-8 md:p-16 animate-in fade-in duration-700">
+              <div className="text-center mb-10">
+                <h3 className="serif text-3xl font-black italic mb-2">Content Multiplier</h3>
+                <p className="text-[10px] uppercase tracking-widest font-black text-gray-400">One topic → Full content suite</p>
+              </div>
+              <form onSubmit={handleContentSuiteSubmit} className="flex flex-col md:flex-row gap-5 p-3 bg-[#FBF9F7] rounded-full border border-[#D7D3CD]/30 shadow-md mb-10">
+                <input type="text" placeholder="Topic (e.g., 2026 Boston Market Forecast)..." className="flex-1 px-8 py-5 bg-transparent outline-none font-medium text-lg placeholder:text-gray-300" value={topic} onChange={(e) => setTopic(e.target.value)} />
+                <button type="submit" disabled={status === AppStatus.LOADING || !topic.trim()} className="bg-[#3A5BFF] text-white px-10 py-5 rounded-full font-black uppercase tracking-[0.3em] text-[10px] flex items-center gap-4 transition-all shadow-xl hover:bg-[#0A0A0A] disabled:opacity-50">
+                  {status === AppStatus.LOADING ? <Loader2 className="animate-spin w-5 h-5" /> : <Layout className="w-5 h-5" />} GENERATE SUITE
+                </button>
+              </form>
+              {contentSuiteResult && (
+                <div className="bg-[#FBF9F7] rounded-[48px] border border-[#D7D3CD]/40 overflow-hidden">
+                  <div className="flex flex-wrap gap-2 p-4 border-b border-[#D7D3CD]/30">
+                    {[{id: 'video', label: 'Video Script'}, {id: 'slides', label: 'Slides'}, {id: 'infographic', label: 'Infographic'}, {id: 'podcast', label: 'Podcast'}, {id: 'quiz', label: 'Quiz'}, {id: 'data', label: 'Data'}].map(tab => (
+                      <button key={tab.id} onClick={() => setContentSuiteTab(tab.id as any)} className={`px-4 py-2 rounded-full text-[10px] font-black uppercase ${contentSuiteTab === tab.id ? 'bg-[#3A5BFF] text-white' : 'bg-white text-gray-500'}`}>{tab.label}</button>
+                    ))}
+                  </div>
+                  <div className="p-8">
+                    <div className="flex justify-end mb-4"><CopyButton text={contentSuiteTab === 'video' ? contentSuiteResult.videoScript : contentSuiteTab === 'slides' ? contentSuiteResult.slideDeck : contentSuiteTab === 'infographic' ? contentSuiteResult.infographic : contentSuiteTab === 'podcast' ? contentSuiteResult.podcastScript : contentSuiteTab === 'quiz' ? contentSuiteResult.quizQuestions.join('\n\n') : contentSuiteResult.dataTable} /></div>
+                    <div className="prose max-w-none whitespace-pre-wrap text-sm">
+                      {contentSuiteTab === 'video' && contentSuiteResult.videoScript}
+                      {contentSuiteTab === 'slides' && contentSuiteResult.slideDeck}
+                      {contentSuiteTab === 'infographic' && contentSuiteResult.infographic}
+                      {contentSuiteTab === 'podcast' && contentSuiteResult.podcastScript}
+                      {contentSuiteTab === 'quiz' && contentSuiteResult.quizQuestions.map((q, i) => <div key={i} className="mb-4 p-4 bg-white rounded-2xl">{q}</div>)}
+                      {contentSuiteTab === 'data' && <pre className="bg-white p-4 rounded-2xl overflow-x-auto">{contentSuiteResult.dataTable}</pre>}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* COMPETITOR IQ */}
+          {mode === 'COMPETITOR_IQ' && (
+            <div className="p-8 md:p-16 animate-in fade-in duration-700">
+              <div className="text-center mb-10">
+                <h3 className="serif text-3xl font-black italic mb-2">Competitor Intelligence</h3>
+                <p className="text-[10px] uppercase tracking-widest font-black text-gray-400">Analyze & outmaneuver the competition</p>
+              </div>
+              <form onSubmit={handleCompetitorSubmit} className="space-y-4 mb-10">
+                <input type="text" placeholder="Your Company Name..." className="w-full px-6 py-4 bg-[#FBF9F7] border border-[#D7D3CD]/30 rounded-2xl outline-none font-medium" value={companyName} onChange={(e) => setCompanyName(e.target.value)} />
+                <div className="grid md:grid-cols-3 gap-4">
+                  {competitors.map((c, i) => (
+                    <input key={i} type="text" placeholder={`Competitor ${i + 1}...`} className="px-6 py-4 bg-[#FBF9F7] border border-[#D7D3CD]/30 rounded-2xl outline-none font-medium" value={c} onChange={(e) => { const newComps = [...competitors]; newComps[i] = e.target.value; setCompetitors(newComps); }} />
+                  ))}
+                </div>
+                <button type="submit" disabled={status === AppStatus.LOADING} className="w-full bg-[#3A5BFF] text-white py-5 rounded-full font-black uppercase tracking-[0.3em] text-[10px] flex items-center justify-center gap-4 transition-all shadow-xl hover:bg-[#0A0A0A] disabled:opacity-50">
+                  {status === AppStatus.LOADING ? <Loader2 className="animate-spin w-5 h-5" /> : <Target className="w-5 h-5" />} ANALYZE COMPETITORS
+                </button>
+              </form>
+              {competitorResult && (
+                <div className="bg-[#FBF9F7] rounded-[48px] border border-[#D7D3CD]/40 overflow-hidden">
+                  <div className="flex flex-wrap gap-2 p-4 border-b border-[#D7D3CD]/30">
+                    {[{id: 'matrix', label: 'Matrix'}, {id: 'pricing', label: 'Pricing'}, {id: 'messaging', label: 'Messaging'}, {id: 'counter', label: 'Counter'}, {id: 'battlecard', label: 'Battle Card'}].map(tab => (
+                      <button key={tab.id} onClick={() => setCompetitorTab(tab.id as any)} className={`px-4 py-2 rounded-full text-[10px] font-black uppercase ${competitorTab === tab.id ? 'bg-[#3A5BFF] text-white' : 'bg-white text-gray-500'}`}>{tab.label}</button>
+                    ))}
+                  </div>
+                  <div className="p-8 whitespace-pre-wrap text-sm">
+                    {competitorTab === 'matrix' && competitorResult.strengthsWeaknesses}
+                    {competitorTab === 'pricing' && competitorResult.pricingAnalysis}
+                    {competitorTab === 'messaging' && competitorResult.messagingAnalysis}
+                    {competitorTab === 'counter' && competitorResult.counterPositioning}
+                    {competitorTab === 'battlecard' && competitorResult.battleCard}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* SALES ACE */}
+          {mode === 'SALES_ACE' && (
+            <div className="p-8 md:p-16 animate-in fade-in duration-700">
+              <div className="text-center mb-10">
+                <h3 className="serif text-3xl font-black italic mb-2">Sales Ace</h3>
+                <p className="text-[10px] uppercase tracking-widest font-black text-gray-400">Objection handling & sales enablement</p>
+              </div>
+              <form onSubmit={handleSalesAceSubmit} className="space-y-4 mb-10">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <input type="text" placeholder="Product/Service Name..." className="px-6 py-4 bg-[#FBF9F7] border border-[#D7D3CD]/30 rounded-2xl outline-none font-medium" value={salesProduct} onChange={(e) => setSalesProduct(e.target.value)} />
+                  <select className="px-6 py-4 bg-[#FBF9F7] border border-[#D7D3CD]/30 rounded-2xl outline-none font-medium" value={salesDealSize} onChange={(e) => setSalesDealSize(e.target.value)}>
+                    <option>{'<$5K'}</option><option>$5K-$15K</option><option>$15K-$50K</option><option>$50K-$100K</option><option>$100K+</option>
+                  </select>
+                </div>
+                <textarea placeholder="Key Value Propositions (3-5 benefits)..." className="w-full px-6 py-4 bg-[#FBF9F7] border border-[#D7D3CD]/30 rounded-2xl outline-none font-medium h-24 resize-none" value={salesValueProps} onChange={(e) => setSalesValueProps(e.target.value)} />
+                <input type="text" placeholder="Top Competitors..." className="w-full px-6 py-4 bg-[#FBF9F7] border border-[#D7D3CD]/30 rounded-2xl outline-none font-medium" value={salesCompetitors} onChange={(e) => setSalesCompetitors(e.target.value)} />
+                <button type="submit" disabled={status === AppStatus.LOADING} className="w-full bg-[#3A5BFF] text-white py-5 rounded-full font-black uppercase tracking-[0.3em] text-[10px] flex items-center justify-center gap-4 transition-all shadow-xl hover:bg-[#0A0A0A] disabled:opacity-50">
+                  {status === AppStatus.LOADING ? <Loader2 className="animate-spin w-5 h-5" /> : <Swords className="w-5 h-5" />} GENERATE SALES KIT
+                </button>
+              </form>
+              {salesResult && (
+                <div className="bg-[#FBF9F7] rounded-[48px] border border-[#D7D3CD]/40 overflow-hidden">
+                  <div className="flex flex-wrap gap-2 p-4 border-b border-[#D7D3CD]/30">
+                    {[{id: 'objections', label: 'Objections'}, {id: 'battlecard', label: 'Battlecard'}, {id: 'voicemail', label: 'Voicemails'}, {id: 'roleplay', label: 'Role-Play'}, {id: 'cheatsheet', label: 'Cheat Sheet'}].map(tab => (
+                      <button key={tab.id} onClick={() => setSalesTab(tab.id as any)} className={`px-4 py-2 rounded-full text-[10px] font-black uppercase ${salesTab === tab.id ? 'bg-[#3A5BFF] text-white' : 'bg-white text-gray-500'}`}>{tab.label}</button>
+                    ))}
+                  </div>
+                  <div className="p-8 whitespace-pre-wrap text-sm max-h-[500px] overflow-y-auto">
+                    {salesTab === 'objections' && salesResult.objectionFrameworks}
+                    {salesTab === 'battlecard' && salesResult.competitorBattlecard}
+                    {salesTab === 'voicemail' && salesResult.voicemailScripts}
+                    {salesTab === 'roleplay' && salesResult.rolePlayScenarios}
+                    {salesTab === 'cheatsheet' && salesResult.quickReferenceCard}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* SOCIAL POSTS */}
+          {mode === 'SOCIAL_POSTS' && (
+            <div className="p-8 md:p-16 animate-in fade-in duration-700">
+              <div className="text-center mb-10">
+                <h3 className="serif text-3xl font-black italic mb-2">Social Post Generator</h3>
+                <p className="text-[10px] uppercase tracking-widest font-black text-gray-400">8-second video scripts + LinkedIn posts</p>
+              </div>
+              <form onSubmit={handleSocialPostSubmit} className="space-y-4 mb-10">
+                <input type="text" placeholder="Topic or Idea..." className="w-full px-6 py-4 bg-[#FBF9F7] border border-[#D7D3CD]/30 rounded-2xl outline-none font-medium" value={socialTopic} onChange={(e) => setSocialTopic(e.target.value)} />
+                <div className="grid md:grid-cols-3 gap-4">
+                  <select className="px-6 py-4 bg-[#FBF9F7] border border-[#D7D3CD]/30 rounded-2xl outline-none font-medium" value={socialPostStyle} onChange={(e) => setSocialPostStyle(e.target.value)}>
+                    <option>Insight</option><option>Story</option><option>Hot Take</option><option>Tip</option><option>Question</option><option>Celebration</option>
+                  </select>
+                  <select className="px-6 py-4 bg-[#FBF9F7] border border-[#D7D3CD]/30 rounded-2xl outline-none font-medium" value={socialVideoStyle} onChange={(e) => setSocialVideoStyle(e.target.value)}>
+                    <option>Talking Head</option><option>Text on Screen</option><option>B-Roll with Voiceover</option><option>Before/After</option><option>Quick Tip Demo</option>
+                  </select>
+                  <select className="px-6 py-4 bg-[#FBF9F7] border border-[#D7D3CD]/30 rounded-2xl outline-none font-medium" value={socialCtaGoal} onChange={(e) => setSocialCtaGoal(e.target.value)}>
+                    <option>Engagement</option><option>DMs</option><option>Link Click</option><option>Awareness</option>
+                  </select>
+                </div>
+                <button type="submit" disabled={status === AppStatus.LOADING} className="w-full bg-[#3A5BFF] text-white py-5 rounded-full font-black uppercase tracking-[0.3em] text-[10px] flex items-center justify-center gap-4 transition-all shadow-xl hover:bg-[#0A0A0A] disabled:opacity-50">
+                  {status === AppStatus.LOADING ? <Loader2 className="animate-spin w-5 h-5" /> : <Linkedin className="w-5 h-5" />} GENERATE POST
+                </button>
+              </form>
+              {socialResult && (
+                <div className="grid md:grid-cols-3 gap-6">
+                  <div className="bg-[#FBF9F7] rounded-[32px] p-6 border border-[#D7D3CD]/40">
+                    <div className="flex justify-between items-center mb-4"><h4 className="text-[10px] uppercase tracking-widest font-black text-[#3A5BFF]">Video Script</h4><CopyButton text={socialResult.videoScript} /></div>
+                    <div className="whitespace-pre-wrap text-sm">{socialResult.videoScript}</div>
+                  </div>
+                  <div className="bg-[#FBF9F7] rounded-[32px] p-6 border border-[#D7D3CD]/40">
+                    <div className="flex justify-between items-center mb-4"><h4 className="text-[10px] uppercase tracking-widest font-black text-[#3A5BFF]">Veo Prompt</h4><CopyButton text={socialResult.geminiPrompt} /></div>
+                    <div className="whitespace-pre-wrap text-sm">{socialResult.geminiPrompt}</div>
+                  </div>
+                  <div className="bg-[#FBF9F7] rounded-[32px] p-6 border border-[#D7D3CD]/40">
+                    <div className="flex justify-between items-center mb-4"><h4 className="text-[10px] uppercase tracking-widest font-black text-[#3A5BFF]">LinkedIn Post ({socialResult.characterCount}/1300)</h4><CopyButton text={socialResult.linkedinPost} /></div>
+                    <div className="whitespace-pre-wrap text-sm">{socialResult.linkedinPost}</div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* PROPOSALS */}
+          {mode === 'PROPOSALS' && (
+            <div className="p-8 md:p-16 animate-in fade-in duration-700">
+              <div className="text-center mb-10">
+                <h3 className="serif text-3xl font-black italic mb-2">Proposal Generator</h3>
+                <p className="text-[10px] uppercase tracking-widest font-black text-gray-400">Professional business proposals in seconds</p>
+              </div>
+              <form onSubmit={handleProposalSubmit} className="space-y-4 mb-10">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <input type="text" placeholder="Prospect Name..." className="px-6 py-4 bg-[#FBF9F7] border border-[#D7D3CD]/30 rounded-2xl outline-none font-medium" value={prospectName} onChange={(e) => setProspectName(e.target.value)} />
+                  <input type="text" placeholder="Company Name..." className="px-6 py-4 bg-[#FBF9F7] border border-[#D7D3CD]/30 rounded-2xl outline-none font-medium" value={prospectCompany} onChange={(e) => setProspectCompany(e.target.value)} />
+                </div>
+                <input type="text" placeholder="Industry..." className="w-full px-6 py-4 bg-[#FBF9F7] border border-[#D7D3CD]/30 rounded-2xl outline-none font-medium" value={prospectIndustry} onChange={(e) => setProspectIndustry(e.target.value)} />
+                <textarea placeholder="Pain Points..." className="w-full px-6 py-4 bg-[#FBF9F7] border border-[#D7D3CD]/30 rounded-2xl outline-none font-medium h-24 resize-none" value={prospectPainPoints} onChange={(e) => setProspectPainPoints(e.target.value)} />
+                <textarea placeholder="Proposed Solution..." className="w-full px-6 py-4 bg-[#FBF9F7] border border-[#D7D3CD]/30 rounded-2xl outline-none font-medium h-24 resize-none" value={proposedSolution} onChange={(e) => setProposedSolution(e.target.value)} />
+                <input type="text" placeholder="Pricing Details..." className="w-full px-6 py-4 bg-[#FBF9F7] border border-[#D7D3CD]/30 rounded-2xl outline-none font-medium" value={proposalPricing} onChange={(e) => setProposalPricing(e.target.value)} />
+                <button type="submit" disabled={status === AppStatus.LOADING} className="w-full bg-[#3A5BFF] text-white py-5 rounded-full font-black uppercase tracking-[0.3em] text-[10px] flex items-center justify-center gap-4 transition-all shadow-xl hover:bg-[#0A0A0A] disabled:opacity-50">
+                  {status === AppStatus.LOADING ? <Loader2 className="animate-spin w-5 h-5" /> : <FileCheck className="w-5 h-5" />} GENERATE PROPOSAL
+                </button>
+              </form>
+              {proposalResult && (
+                <div className="bg-[#FBF9F7] rounded-[48px] border border-[#D7D3CD]/40 overflow-hidden">
+                  <div className="flex flex-wrap gap-2 p-4 border-b border-[#D7D3CD]/30">
+                    {[{id: 'summary', label: 'Summary'}, {id: 'problem', label: 'Problem'}, {id: 'scope', label: 'Scope'}, {id: 'timeline', label: 'Timeline'}, {id: 'investment', label: 'Investment'}, {id: 'next', label: 'Next Steps'}].map(tab => (
+                      <button key={tab.id} onClick={() => setProposalTab(tab.id as any)} className={`px-4 py-2 rounded-full text-[10px] font-black uppercase ${proposalTab === tab.id ? 'bg-[#3A5BFF] text-white' : 'bg-white text-gray-500'}`}>{tab.label}</button>
+                    ))}
+                  </div>
+                  <div className="p-8 whitespace-pre-wrap text-sm">
+                    {proposalTab === 'summary' && proposalResult.executiveSummary}
+                    {proposalTab === 'problem' && proposalResult.problemStatement}
+                    {proposalTab === 'scope' && proposalResult.scopeOfWork}
+                    {proposalTab === 'timeline' && proposalResult.timeline}
+                    {proposalTab === 'investment' && proposalResult.investmentBreakdown}
+                    {proposalTab === 'next' && proposalResult.nextSteps}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
