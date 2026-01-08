@@ -1,4 +1,3 @@
-
 export interface VideoPackage {
   title: string;
   script_text: string;
@@ -47,19 +46,21 @@ export interface ProposalResult {
   nextSteps: string;
 }
 
-export enum AppStatus {
-  IDLE = 'IDLE',
-  LOADING = 'LOADING',
-  SUCCESS = 'SUCCESS',
-  ERROR = 'ERROR'
-}
+// Using string union type for client-side compatibility
+export type AppStatus = "IDLE" | "LOADING" | "SUCCESS" | "ERROR";
 
 export type ToolMode =
-  | 'PRODUCER'
-  | 'LIVE_CONSULTANT'
-  | 'VEO_ANIMATOR'
-  | 'CONTENT_SUITE'
-  | 'COMPETITOR_IQ'
-  | 'SALES_ACE'
-  | 'SOCIAL_POSTS'
-  | 'PROPOSALS';
+  | "PRODUCER"
+  | "LIVE_CONSULTANT"
+  | "VEO_ANIMATOR"
+  | "CONTENT_SUITE"
+  | "COMPETITOR_IQ"
+  | "SALES_ACE"
+  | "SOCIAL_POSTS"
+  | "PROPOSALS";
+
+export interface GenerationResult<T> {
+  success: boolean;
+  data?: T;
+  error?: string;
+}

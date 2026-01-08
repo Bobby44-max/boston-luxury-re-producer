@@ -1,8 +1,0 @@
-{
-  "name": "Boston Luxury RE Producer",
-  "description": "An executive AI tool for Boston real estate agents to generate high-production video scripts and visual prompts using Veo 3 and Gemini.",
-  "requestFramePermissions": [
-    "camera",
-    "microphone"
-  ]
-}
