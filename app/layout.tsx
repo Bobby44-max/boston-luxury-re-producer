@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
-import SessionProvider from "@/components/SessionProvider";
+import { ClerkProvider } from "@clerk/nextjs";
+import { ConvexClientProvider } from "@/components/ConvexProvider";
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -10,12 +11,12 @@ const plusJakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Boston Luxury RE Producer | 2026 Edition",
+  title: "Apex Real Estate AI | 2026 Edition",
   description:
-    "AI-Powered Production Suite for Boston Luxury Real Estate. Generate video scripts, VEO animations, content packages, and sales materials.",
+    "AI-Powered Video Production Suite for Real Estate. Generate stunning property videos from any listing URL in minutes. Powered by Firecrawl + Remotion + Gemini.",
   openGraph: {
-    title: "Boston Luxury RE Producer",
-    description: "AI-Powered Production Suite for Boston Luxury Real Estate",
+    title: "Apex Real Estate AI",
+    description: "Transform any listing URL into professional marketing videos with AI",
     type: "website",
   },
 };
@@ -26,16 +27,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className={`${plusJakarta.variable} font-sans antialiased`}>
-        <SessionProvider>
-          {/* Ambient Gradient Orbs */}
-          <div className="ambient-gradient gradient-cyan" />
-          <div className="ambient-gradient gradient-violet" />
-          <div className="ambient-gradient gradient-orange" />
-          {children}
-        </SessionProvider>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en" className="dark">
+        <body className={`${plusJakarta.variable} font-sans antialiased`}>
+          <ConvexClientProvider>
+            {/* Ambient Gradient Orbs */}
+            <div className="ambient-gradient gradient-cyan" />
+            <div className="ambient-gradient gradient-violet" />
+            <div className="ambient-gradient gradient-orange" />
+            {children}
+          </ConvexClientProvider>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

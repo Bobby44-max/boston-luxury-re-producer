@@ -1,20 +1,40 @@
 {
-  "name": "boston-re-producer",
-  "version": "1.0.0",
+  "name": "apex-real-estate-ai",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3001",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "remotion:studio": "remotion studio",
+    "remotion:build": "remotion bundle",
+    "remotion:render": "remotion render"
   },
   "dependencies": {
+    "@clerk/nextjs": "^5.0.0",
     "@google/generative-ai": "^0.21.0",
+    "@mendable/firecrawl-js": "^1.0.0",
+    "@remotion/bundler": "^4.0.0",
+    "@remotion/cli": "^4.0.0",
+    "@remotion/google-fonts": "^4.0.0",
+    "@remotion/lambda": "^4.0.0",
+    "@remotion/media-utils": "^4.0.0",
+    "@remotion/player": "^4.0.0",
+    "@remotion/renderer": "^4.0.0",
+    "@remotion/transitions": "^4.0.0",
+    "@stripe/stripe-js": "^2.0.0",
+    "@supabase/supabase-js": "^2.39.0",
+    "convex": "^1.0.0",
+    "framer-motion": "^11.0.0",
     "lucide-react": "^0.468.0",
     "next": "^15.1.0",
-    "next-auth": "^4.24.10",
+    "openai": "^4.0.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "remotion": "^4.0.0",
+    "stripe": "^14.0.0",
+    "zod": "^3.22.0"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
