@@ -388,42 +388,18 @@ export default function BostonREProducer() {
       {/* Video Modal */}
       <VideoModal isOpen={showVideoModal} onClose={() => setShowVideoModal(false)} />
 
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 via-violet-500 to-orange-500 flex items-center justify-center">
-              <span className="text-white font-bold text-lg">B</span>
-            </div>
-            <div>
-              <h1 className="text-lg font-bold gradient-text">Boston Luxury</h1>
-              <p className="text-xs text-white/40">RE Producer Suite</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <StatusBadge label="Gemini 2.0 Flash" live />
-            <Link href="/" className="btn-secondary text-sm">
-              <Video className="w-4 h-4" /> Avatar
-            </Link>
-            <button onClick={() => setShowVideoModal(true)} className="btn-secondary text-sm">
-              <Play className="w-4 h-4" /> Demo
-            </button>
-          </div>
-        </div>
-      </header>
-
       {/* Main Content */}
-      <main className="pt-24 px-6 max-w-7xl mx-auto">
+      <main className="pt-8 px-6 max-w-7xl mx-auto">
         {/* Hero Section */}
         <section className="mb-12">
           <GlassCard className="p-8 md:p-12">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
               <div>
                 <h2 className="text-3xl md:text-4xl font-bold mb-2">
-                  <span className="gradient-text">AI-Powered</span> Production Suite
+                  <span className="bg-gradient-to-r from-emerald-400 via-cyan-400 to-violet-400 bg-clip-text text-transparent">Real Easy</span> Production Suite
                 </h2>
                 <p className="text-white/50 max-w-xl">
-                  Generate video scripts, VEO animations, content packages, and sales materials for the Greater Boston luxury market.
+                  Generate video scripts, AI animations, content packages, and sales materials. Paste any listing URL to get started.
                 </p>
               </div>
               <div className="flex gap-3">

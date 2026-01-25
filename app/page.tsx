@@ -1,16 +1,16 @@
 "use client";
 
-import { useUser, useClerk } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
 import { useState } from "react";
 import {
   User,
   Video,
   Loader2,
-  LogOut,
   Sparkles,
   Play,
   Download,
   Volume2,
+  ArrowRight,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -31,7 +31,6 @@ const VOICES = [
 
 export default function HomePage() {
   const { user, isLoaded, isSignedIn } = useUser();
-  const { signOut } = useClerk();
   const [script, setScript] = useState("");
   const [selectedAvatar, setSelectedAvatar] = useState(AVATARS[0].id);
   const [selectedVoice, setSelectedVoice] = useState(VOICES[0].id);
@@ -63,7 +62,6 @@ export default function HomePage() {
         throw new Error(data.error || "Failed to generate video");
       }
 
-      // Poll for video completion
       if (data.videoId) {
         pollForVideo(data.videoId);
       }
@@ -74,7 +72,7 @@ export default function HomePage() {
   };
 
   const pollForVideo = async (videoId: string) => {
-    const maxAttempts = 60; // 5 minutes max
+    const maxAttempts = 60;
     let attempts = 0;
 
     const poll = async () => {
@@ -90,7 +88,7 @@ export default function HomePage() {
           setError("Video generation failed");
           setIsGenerating(false);
         } else if (attempts < maxAttempts) {
-          setTimeout(poll, 5000); // Poll every 5 seconds
+          setTimeout(poll, 5000);
         } else {
           setError("Video generation timed out");
           setIsGenerating(false);
@@ -104,96 +102,144 @@ export default function HomePage() {
     poll();
   };
 
-  // Show loading spinner
   if (!isLoaded) {
     return (
       <div className="min-h-screen bg-[#09090B] text-white flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-cyan-400" />
+        <Loader2 className="w-8 h-8 animate-spin text-emerald-400" />
       </div>
     );
   }
 
-  // Show login prompt if not authenticated
+  // Landing page for non-authenticated users
   if (!isSignedIn) {
     return (
-      <div className="min-h-screen bg-[#09090B] text-white flex items-center justify-center relative z-10">
-        <div className="glass-panel p-12 max-w-md w-full mx-4 text-center">
-          <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-pink-500 to-violet-500 flex items-center justify-center">
-            <Video className="w-8 h-8 text-white" />
+      <div className="min-h-screen bg-[#09090B] text-white relative z-10">
+        {/* Hero Section */}
+        <section className="pt-20 pb-32 px-6">
+          <div className="max-w-5xl mx-auto text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-emerald-400 text-sm font-medium mb-8">
+              <Sparkles className="w-4 h-4" />
+              AI-Powered Real Estate Marketing
+            </div>
+
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+              <span className="bg-gradient-to-r from-emerald-400 via-cyan-400 to-violet-400 bg-clip-text text-transparent">
+                Real Easy Realty
+              </span>
+              <br />
+              <span className="text-white/90">Video in Minutes</span>
+            </h1>
+
+            <p className="text-xl text-white/50 max-w-2xl mx-auto mb-12">
+              Paste any listing URL. Get a stunning marketing video with AI voiceover.
+              No filming. No editing. Just results.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link
+                href="/tools"
+                className="group flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-semibold rounded-xl hover:opacity-90 transition-all shadow-lg shadow-emerald-500/25"
+              >
+                Try AI Video Studio
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <Link
+                href="/tools"
+                className="flex items-center gap-2 px-8 py-4 bg-white/5 text-white/70 font-semibold rounded-xl hover:bg-white/10 transition-all border border-white/10"
+              >
+                <Video className="w-5 h-5" />
+                Explore Tools
+              </Link>
+            </div>
           </div>
+        </section>
 
-          <h1 className="text-2xl font-bold mb-2">AI Avatar Generator</h1>
-          <p className="text-white/40 mb-8">
-            Sign in to create AI-powered video avatars for your listings
-          </p>
+        {/* Features Grid */}
+        <section className="py-20 px-6 border-t border-white/5">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-3xl font-bold text-center mb-4">
+              Why Realtors Love Us
+            </h2>
+            <p className="text-white/50 text-center mb-16 max-w-2xl mx-auto">
+              Stop wasting hours on video production. We handle everything from data extraction to final render.
+            </p>
 
-          <Link
-            href="/sign-in"
-            className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-white text-black font-semibold rounded-xl hover:bg-white/90 transition-all mb-4"
-          >
-            Sign In to Continue
-          </Link>
+            <div className="grid md:grid-cols-3 gap-6">
+              {[
+                {
+                  title: "Paste Any URL",
+                  desc: "Zillow, Redfin, Realtor.com - we extract everything automatically",
+                  icon: "🔗",
+                  color: "from-emerald-500/20 to-emerald-500/5",
+                },
+                {
+                  title: "AI Script Writer",
+                  desc: "Gemini generates compelling scripts tailored to each property",
+                  icon: "✨",
+                  color: "from-cyan-500/20 to-cyan-500/5",
+                },
+                {
+                  title: "Pro Voiceover",
+                  desc: "5 premium AI voices that sound natural and professional",
+                  icon: "🎙️",
+                  color: "from-violet-500/20 to-violet-500/5",
+                },
+                {
+                  title: "Stunning Animations",
+                  desc: "Remotion renders cinematic videos with smooth transitions",
+                  icon: "🎬",
+                  color: "from-pink-500/20 to-pink-500/5",
+                },
+                {
+                  title: "Multiple Formats",
+                  desc: "16:9 for YouTube, 9:16 for TikTok & Reels, all in one click",
+                  icon: "📱",
+                  color: "from-orange-500/20 to-orange-500/5",
+                },
+                {
+                  title: "Your Branding",
+                  desc: "Add your logo, colors, and contact info to every video",
+                  icon: "🏷️",
+                  color: "from-emerald-500/20 to-emerald-500/5",
+                },
+              ].map((feature, i) => (
+                <div
+                  key={i}
+                  className={`glass-panel p-6 bg-gradient-to-br ${feature.color} border-white/5`}
+                >
+                  <div className="text-4xl mb-4">{feature.icon}</div>
+                  <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
+                  <p className="text-sm text-white/50">{feature.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
 
-          <Link
-            href="/tools"
-            className="text-white/50 hover:text-white text-sm flex items-center justify-center gap-2"
-          >
-            <Sparkles className="w-4 h-4" />
-            Use AI Tools Without Sign In
-          </Link>
-        </div>
+        {/* CTA Section */}
+        <section className="py-20 px-6">
+          <div className="max-w-4xl mx-auto text-center glass-panel p-12 bg-gradient-to-br from-emerald-500/10 to-violet-500/10">
+            <h2 className="text-3xl font-bold mb-4">Ready to 10x Your Listings?</h2>
+            <p className="text-white/50 mb-8">
+              Join thousands of realtors using AI to create scroll-stopping content.
+            </p>
+            <Link
+              href="/tools"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black font-semibold rounded-xl hover:bg-white/90 transition-all"
+            >
+              Start Creating Free
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+        </section>
       </div>
     );
   }
 
-  // Authenticated view
+  // Authenticated view - Avatar Studio
   return (
     <div className="min-h-screen bg-[#09090B] text-white relative z-10 pb-12">
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 px-6 py-4 bg-black/50 backdrop-blur-xl border-b border-white/5">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 via-violet-500 to-orange-500 flex items-center justify-center">
-                <span className="text-white font-bold text-lg">A</span>
-              </div>
-              <div>
-                <h1 className="text-lg font-bold gradient-text">
-                  Apex Real Estate
-                </h1>
-                <p className="text-xs text-white/40">AI Avatar Studio</p>
-              </div>
-            </Link>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 px-3 py-2 bg-white/5 rounded-lg border border-white/10">
-              {user?.imageUrl ? (
-                <img
-                  src={user.imageUrl}
-                  alt=""
-                  className="w-6 h-6 rounded-full"
-                />
-              ) : (
-                <User className="w-5 h-5 text-white/50" />
-              )}
-              <span className="text-sm text-white/70">
-                {user?.firstName || user?.emailAddresses[0]?.emailAddress}
-              </span>
-            </div>
-            <button
-              onClick={() => signOut({ redirectUrl: "/" })}
-              className="p-2 bg-white/5 hover:bg-white/10 rounded-lg transition-all"
-              title="Sign out"
-            >
-              <LogOut className="w-5 h-5 text-white/50" />
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="pt-24 px-6 max-w-7xl mx-auto">
+      <main className="pt-8 px-6 max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Input Panel */}
           <div className="glass-panel p-8">
@@ -308,12 +354,8 @@ export default function HomePage() {
               {isGenerating ? (
                 <div className="text-center">
                   <Loader2 className="w-16 h-16 text-violet-400 animate-spin mx-auto mb-4" />
-                  <p className="text-white/50">
-                    Generating your avatar video...
-                  </p>
-                  <p className="text-xs text-white/30 mt-2">
-                    This may take 1-3 minutes
-                  </p>
+                  <p className="text-white/50">Generating your avatar video...</p>
+                  <p className="text-xs text-white/30 mt-2">This may take 1-3 minutes</p>
                 </div>
               ) : videoUrl ? (
                 <video
@@ -325,9 +367,7 @@ export default function HomePage() {
               ) : (
                 <div className="text-center">
                   <Play className="w-16 h-16 text-white/10 mx-auto mb-4" />
-                  <p className="text-white/30">
-                    Your video preview will appear here
-                  </p>
+                  <p className="text-white/30">Your video preview will appear here</p>
                 </div>
               )}
             </div>
