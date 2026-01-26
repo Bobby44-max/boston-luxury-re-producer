@@ -1,16 +1,5 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
-// Define public routes (marketing pages)
-const isPublicRoute = createRouteMatcher([
-  '/',
-  '/sign-in(.*)',
-  '/sign-up(.*)',
-  '/privacy(.*)',
-  '/terms(.*)',
-  '/api/webhooks(.*)',
-  '/api/health',
-]);
-
 // Define protected routes (console/OS)
 const isProtectedRoute = createRouteMatcher([
   '/dashboard(.*)',
@@ -23,15 +12,10 @@ const isProtectedRoute = createRouteMatcher([
   '/api/render(.*)',
 ]);
 
-export default clerkMiddleware(async (auth, request) => {
-  // Protect console routes
+export default clerkMiddleware((auth, request) => {
+  // Protect console routes - Clerk handles redirect automatically
   if (isProtectedRoute(request)) {
-    const { userId } = await auth();
-    if (!userId) {
-      const signInUrl = new URL('/sign-in', request.url);
-      signInUrl.searchParams.set('redirect_url', request.url);
-      return Response.redirect(signInUrl);
-    }
+    auth().protect();
   }
 });
 
