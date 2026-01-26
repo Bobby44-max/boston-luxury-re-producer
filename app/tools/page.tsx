@@ -1,453 +1,459 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
 import {
   Video,
-  Sparkles,
-  TrendingUp,
-  Users,
-  BarChart3,
-  Home,
   Play,
-  ChevronRight,
-  Star,
+  ArrowRight,
+  Check,
   Zap,
   Globe,
-  Shield,
-  Clock,
-  DollarSign,
-  Award,
-  Layers,
-  Target,
   Mic,
-  FileText,
-  Share2,
-  ArrowRight,
+  ChevronRight,
+  Star,
+  BarChart3,
+  Clock,
+  Users,
+  TrendingUp,
 } from "lucide-react";
 import VideoStudio from "@/components/VideoStudio";
 
-// Feature cards for the dashboard
-const FEATURES = [
+// Metrics data
+const METRICS = [
+  { value: "4.2s", label: "Avg. render time", sublabel: "per 30s video" },
+  { value: "340%", label: "Engagement lift", sublabel: "vs. static listings" },
+  { value: "12K+", label: "Videos rendered", sublabel: "this quarter" },
+];
+
+// Process steps
+const PROCESS = [
   {
-    icon: Video,
-    title: "AI Video Studio",
-    description: "Turn any listing URL into stunning property videos with Remotion",
-    gradient: "from-cyan-500 to-violet-500",
-    tag: "Core Feature",
+    num: "01",
+    title: "Paste any listing URL",
+    desc: "Zillow, Redfin, Realtor.com, or direct MLS links. Our Firecrawl engine extracts everything.",
   },
   {
-    icon: Globe,
-    title: "Firecrawl Scraping",
-    description: "Extract property data from Zillow, Redfin, Realtor.com & more",
-    gradient: "from-emerald-500 to-cyan-500",
-    tag: "AI Powered",
+    num: "02",
+    title: "AI builds your narrative",
+    desc: "Property features become compelling scripts. Choose from 5 professional voice styles.",
   },
   {
-    icon: Mic,
-    title: "AI Voiceover",
-    description: "Professional narration with OpenAI voices in 5 styles",
-    gradient: "from-violet-500 to-pink-500",
-    tag: "Premium",
-  },
-  {
-    icon: Layers,
-    title: "4 Video Formats",
-    description: "Property showcase, social shorts, market stats & just listed",
-    gradient: "from-orange-500 to-red-500",
-    tag: "Templates",
+    num: "03",
+    title: "Remotion renders in minutes",
+    desc: "React-based video generation. Every frame programmatically perfect, ready to deploy.",
   },
 ];
 
-// Stats for the hero section
-const STATS = [
-  { label: "Videos Generated", value: "12,400+", icon: Play },
-  { label: "Agents Using", value: "2,100+", icon: Users },
-  { label: "Avg. Engagement", value: "+340%", icon: TrendingUp },
-  { label: "Time Saved", value: "8hrs/week", icon: Clock },
-];
+// Testimonial
+const TESTIMONIAL = {
+  quote: "We replaced our entire video production workflow. What took our team 6 hours now takes 4 minutes.",
+  author: "Sarah Chen",
+  role: "Director of Marketing",
+  company: "Beacon Hill Properties",
+};
 
-// Testimonials
-const TESTIMONIALS = [
+// Pricing
+const PLANS = [
   {
-    quote: "This completely transformed how I market luxury properties. The AI videos get 5x more engagement than my photos.",
-    author: "Sarah Chen",
-    role: "Luxury Agent, Beacon Hill",
-    avatar: "SC",
-  },
-  {
-    quote: "I used to spend $500 per listing video. Now I create better ones in minutes. Game changer.",
-    author: "Michael Torres",
-    role: "Broker, Back Bay Realty",
-    avatar: "MT",
-  },
-  {
-    quote: "The Firecrawl integration is incredible - paste a URL and it pulls everything automatically.",
-    author: "Jennifer Walsh",
-    role: "Team Lead, Seaport Living",
-    avatar: "JW",
-  },
-];
-
-// Pricing tiers
-const PRICING = [
-  {
-    name: "Starter",
-    price: "$49",
-    period: "/month",
-    features: ["10 videos/month", "720p export", "Basic templates", "Email support"],
-    popular: false,
+    name: "Essential",
+    price: "49",
+    desc: "For individual agents",
+    features: ["10 videos/month", "720p export", "3 templates", "Email support"],
+    cta: "Start free trial",
+    featured: false,
   },
   {
     name: "Professional",
-    price: "$149",
-    period: "/month",
+    price: "149",
+    desc: "For growing teams",
     features: ["Unlimited videos", "4K export", "All templates", "AI voiceover", "Priority support", "Custom branding"],
-    popular: true,
+    cta: "Start free trial",
+    featured: true,
   },
   {
-    name: "Team",
-    price: "$399",
-    period: "/month",
-    features: ["Everything in Pro", "5 team seats", "API access", "White label", "Dedicated success manager"],
-    popular: false,
+    name: "Enterprise",
+    price: "Custom",
+    desc: "For brokerages",
+    features: ["Everything in Pro", "Unlimited seats", "API access", "White-label", "Dedicated CSM", "SLA guarantee"],
+    cta: "Contact sales",
+    featured: false,
   },
 ];
 
 export default function ToolsPage() {
-  const [activeTab, setActiveTab] = useState<"studio" | "dashboard">("studio");
+  const [view, setView] = useState<"studio" | "overview">("studio");
 
   return (
-    <div className="min-h-screen bg-[#09090B] text-white">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-violet-500/5 to-transparent pointer-events-none" />
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-violet-500/20 rounded-full blur-[150px] pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-cyan-500/20 rounded-full blur-[120px] pointer-events-none" />
-
-        <div className="relative max-w-7xl mx-auto px-6 pt-12 pb-8">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-12">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 via-cyan-500 to-violet-500 flex items-center justify-center shadow-lg shadow-cyan-500/30">
-                <Home className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold">
-                  <span className="bg-gradient-to-r from-emerald-400 via-cyan-400 to-violet-400 bg-clip-text text-transparent">Real Easy</span>
-                  <span className="text-white/80"> Realty</span>
-                </h1>
-                <p className="text-sm text-white/40">AI-Powered Real Estate Production Suite</p>
-              </div>
+    <div className="min-h-screen bg-[#0A0A0A] text-[#FAFAFA] antialiased">
+      {/* Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#0A0A0A]/80 backdrop-blur-xl">
+        <div className="max-w-[1280px] mx-auto px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 to-cyan-400 flex items-center justify-center">
+              <span className="text-[#0A0A0A] font-bold text-sm">RE</span>
             </div>
-
-            {/* Tab Switcher */}
-            <div className="flex items-center gap-2 p-1 bg-white/5 rounded-xl border border-white/10">
-              <button
-                onClick={() => setActiveTab("studio")}
-                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-                  activeTab === "studio"
-                    ? "bg-gradient-to-r from-cyan-500 to-violet-500 text-white shadow-lg"
-                    : "text-white/60 hover:text-white hover:bg-white/5"
-                }`}
-              >
-                <Video className="w-4 h-4 inline mr-2" />
-                Video Studio
-              </button>
-              <button
-                onClick={() => setActiveTab("dashboard")}
-                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-                  activeTab === "dashboard"
-                    ? "bg-gradient-to-r from-cyan-500 to-violet-500 text-white shadow-lg"
-                    : "text-white/60 hover:text-white hover:bg-white/5"
-                }`}
-              >
-                <BarChart3 className="w-4 h-4 inline mr-2" />
-                Dashboard
-              </button>
-            </div>
+            <span className="font-semibold tracking-tight">Real Easy Realty</span>
           </div>
 
-          {/* Conditional Content */}
-          {activeTab === "studio" ? (
-            <>
-              {/* Hero Text */}
-              <div className="text-center mb-12">
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-500/10 to-violet-500/10 rounded-full border border-cyan-500/20 mb-6">
-                  <Sparkles className="w-4 h-4 text-cyan-400" />
-                  <span className="text-sm font-medium text-cyan-300">Powered by Remotion + Firecrawl + AI</span>
+          <div className="hidden md:flex items-center gap-1 p-1 bg-white/[0.04] rounded-lg">
+            <button
+              onClick={() => setView("studio")}
+              className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
+                view === "studio"
+                  ? "bg-white/[0.08] text-white"
+                  : "text-white/50 hover:text-white/70"
+              }`}
+            >
+              Studio
+            </button>
+            <button
+              onClick={() => setView("overview")}
+              className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
+                view === "overview"
+                  ? "bg-white/[0.08] text-white"
+                  : "text-white/50 hover:text-white/70"
+              }`}
+            >
+              Overview
+            </button>
+          </div>
+
+          <button className="px-4 py-2 bg-white text-[#0A0A0A] rounded-lg text-sm font-semibold hover:bg-white/90 transition-colors">
+            Sign in
+          </button>
+        </div>
+      </nav>
+
+      <main className="pt-16">
+        {view === "studio" ? (
+          /* ═══════════════════════════════════════════════════════════════
+             STUDIO VIEW - VideoStudio is the hero
+             ═══════════════════════════════════════════════════════════════ */
+          <div className="max-w-[1280px] mx-auto px-6">
+            {/* Hero Header */}
+            <section className="pt-16 pb-12">
+              <div className="max-w-3xl">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-400/[0.08] border border-emerald-400/20 rounded-full mb-6">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-xs font-medium text-emerald-400 uppercase tracking-wider">
+                    Remotion + Firecrawl + AI
+                  </span>
                 </div>
-                <h2 className="text-4xl md:text-5xl font-bold mb-4">
-                  <span className="bg-gradient-to-r from-white via-white to-white/60 bg-clip-text text-transparent">
-                    Turn Any Listing Into a
-                  </span>
+
+                <h1 className="text-[clamp(2rem,5vw,3.5rem)] font-bold leading-[1.1] tracking-tight mb-4">
+                  Listing URL in.
                   <br />
-                  <span className="bg-gradient-to-r from-cyan-400 via-violet-400 to-pink-400 bg-clip-text text-transparent">
-                    Stunning Video in Minutes
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-400 to-violet-400">
+                    Studio-grade video out.
                   </span>
+                </h1>
+
+                <p className="text-lg text-white/50 leading-relaxed max-w-xl">
+                  Paste any property link. Our agentic pipeline scrapes the data, writes the script,
+                  generates voiceover, and renders with Remotion—in minutes, not hours.
+                </p>
+              </div>
+            </section>
+
+            {/* Metrics Bar */}
+            <section className="grid grid-cols-3 gap-px bg-white/[0.06] rounded-xl overflow-hidden mb-12">
+              {METRICS.map((metric, i) => (
+                <div key={i} className="bg-[#0A0A0A] p-6 text-center">
+                  <div className="text-2xl md:text-3xl font-bold text-white mb-1">{metric.value}</div>
+                  <div className="text-sm text-white/40">{metric.label}</div>
+                  <div className="text-xs text-white/25">{metric.sublabel}</div>
+                </div>
+              ))}
+            </section>
+
+            {/* VideoStudio Component */}
+            <section className="mb-24">
+              <VideoStudio />
+            </section>
+
+            {/* Process Section */}
+            <section className="py-24 border-t border-white/[0.06]">
+              <div className="mb-16">
+                <h2 className="text-sm font-medium text-white/40 uppercase tracking-wider mb-3">
+                  How it works
                 </h2>
-                <p className="text-lg text-white/50 max-w-2xl mx-auto">
-                  Paste a Zillow, Redfin, or any listing URL. Our AI scrapes the data, writes the script,
-                  generates professional voiceover, and renders a beautiful video with Remotion.
+                <p className="text-2xl md:text-3xl font-semibold leading-tight max-w-lg">
+                  Three steps from URL to deployment-ready video.
                 </p>
               </div>
 
-              {/* Stats Bar */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
-                {STATS.map((stat, i) => {
-                  const Icon = stat.icon;
-                  return (
-                    <div
-                      key={i}
-                      className="glass-panel p-4 flex items-center gap-3 hover:bg-white/5 transition-all cursor-default"
+              <div className="grid md:grid-cols-3 gap-8">
+                {PROCESS.map((step, i) => (
+                  <div key={i} className="group">
+                    <div className="text-5xl font-bold text-white/[0.06] mb-4 group-hover:text-white/[0.12] transition-colors">
+                      {step.num}
+                    </div>
+                    <h3 className="text-lg font-semibold mb-2">{step.title}</h3>
+                    <p className="text-sm text-white/40 leading-relaxed">{step.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Testimonial */}
+            <section className="py-24 border-t border-white/[0.06]">
+              <div className="max-w-2xl mx-auto text-center">
+                <div className="flex items-center justify-center gap-1 mb-8">
+                  {[1,2,3,4,5].map(n => (
+                    <Star key={n} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                  ))}
+                </div>
+                <blockquote className="text-xl md:text-2xl font-medium leading-relaxed mb-8">
+                  "{TESTIMONIAL.quote}"
+                </blockquote>
+                <div>
+                  <div className="font-semibold">{TESTIMONIAL.author}</div>
+                  <div className="text-sm text-white/40">
+                    {TESTIMONIAL.role}, {TESTIMONIAL.company}
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+        ) : (
+          /* ═══════════════════════════════════════════════════════════════
+             OVERVIEW VIEW - Features, pricing, conversion
+             ═══════════════════════════════════════════════════════════════ */
+          <div>
+            {/* Hero */}
+            <section className="max-w-[1280px] mx-auto px-6 pt-24 pb-32">
+              <div className="grid lg:grid-cols-2 gap-16 items-center">
+                <div>
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/[0.04] border border-white/[0.08] rounded-full mb-6">
+                    <Zap className="w-3.5 h-3.5 text-cyan-400" />
+                    <span className="text-xs font-medium text-white/60">
+                      Video-as-Code Production
+                    </span>
+                  </div>
+
+                  <h1 className="text-[clamp(2.5rem,6vw,4rem)] font-bold leading-[1.05] tracking-tight mb-6">
+                    The death of
+                    <br />
+                    manual editing.
+                  </h1>
+
+                  <p className="text-lg text-white/50 leading-relaxed mb-8 max-w-md">
+                    Traditional video production is operational debt. Our agentic pipeline
+                    transforms natural language into studio-quality motion graphics.
+                  </p>
+
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <button
+                      onClick={() => setView("studio")}
+                      className="px-6 py-3 bg-white text-[#0A0A0A] rounded-lg font-semibold hover:bg-white/90 transition-colors flex items-center justify-center gap-2"
                     >
-                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500/20 to-violet-500/20 flex items-center justify-center">
-                        <Icon className="w-5 h-5 text-cyan-400" />
-                      </div>
-                      <div>
-                        <p className="text-xl font-bold text-white">{stat.value}</p>
-                        <p className="text-xs text-white/40">{stat.label}</p>
+                      Open Studio <ArrowRight className="w-4 h-4" />
+                    </button>
+                    <button className="px-6 py-3 bg-white/[0.04] border border-white/[0.08] rounded-lg font-semibold hover:bg-white/[0.08] transition-colors">
+                      Watch demo
+                    </button>
+                  </div>
+                </div>
+
+                {/* Hero Visual */}
+                <div className="relative">
+                  <div className="aspect-video rounded-2xl bg-gradient-to-br from-white/[0.04] to-transparent border border-white/[0.08] overflow-hidden">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-16 h-16 rounded-full bg-white/[0.08] flex items-center justify-center cursor-pointer hover:bg-white/[0.12] transition-colors">
+                        <Play className="w-6 h-6 text-white ml-1" />
                       </div>
                     </div>
-                  );
-                })}
+                    {/* Grid overlay */}
+                    <div className="absolute inset-0 opacity-[0.03]" style={{
+                      backgroundImage: `linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)`,
+                      backgroundSize: '40px 40px'
+                    }} />
+                  </div>
+                  {/* Floating badge */}
+                  <div className="absolute -bottom-4 -left-4 px-4 py-2 bg-[#0A0A0A] border border-white/[0.08] rounded-lg">
+                    <div className="text-xs text-white/40 mb-0.5">Render time</div>
+                    <div className="text-lg font-bold">4.2 seconds</div>
+                  </div>
+                </div>
               </div>
+            </section>
 
-              {/* Video Studio Component */}
-              <VideoStudio />
-
-              {/* Features Grid */}
-              <div className="mt-16 mb-12">
-                <h3 className="text-2xl font-bold text-center mb-8">
-                  <span className="gradient-text">How It Works</span>
-                </h3>
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {FEATURES.map((feature, i) => {
-                    const Icon = feature.icon;
+            {/* Value Props */}
+            <section className="border-t border-white/[0.06] py-24">
+              <div className="max-w-[1280px] mx-auto px-6">
+                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                  {[
+                    { icon: Globe, title: "Universal Scraping", desc: "Zillow, Redfin, Realtor, MLS—any listing URL works." },
+                    { icon: Video, title: "React-Based Rendering", desc: "Remotion compiles every frame programmatically." },
+                    { icon: Mic, title: "5 Voice Styles", desc: "11Labs integration for natural, professional narration." },
+                    { icon: BarChart3, title: "Analytics Ready", desc: "Track engagement, A/B test, and optimize." },
+                  ].map((item, i) => {
+                    const Icon = item.icon;
                     return (
-                      <div
-                        key={i}
-                        className="glass-panel p-6 hover:bg-white/5 transition-all group cursor-default"
-                      >
-                        <div
-                          className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}
-                        >
-                          <Icon className="w-6 h-6 text-white" />
+                      <div key={i} className="group">
+                        <div className="w-10 h-10 rounded-lg bg-white/[0.04] flex items-center justify-center mb-4 group-hover:bg-white/[0.08] transition-colors">
+                          <Icon className="w-5 h-5 text-white/60" />
                         </div>
-                        <div className="flex items-center gap-2 mb-2">
-                          <h4 className="font-semibold text-white">{feature.title}</h4>
-                          <span className="text-[10px] px-2 py-0.5 bg-white/10 rounded-full text-white/50">
-                            {feature.tag}
-                          </span>
-                        </div>
-                        <p className="text-sm text-white/50">{feature.description}</p>
+                        <h3 className="font-semibold mb-2">{item.title}</h3>
+                        <p className="text-sm text-white/40 leading-relaxed">{item.desc}</p>
                       </div>
                     );
                   })}
                 </div>
               </div>
+            </section>
 
-              {/* Process Steps */}
-              <div className="glass-panel p-8 mb-12">
-                <h3 className="text-xl font-bold text-center mb-8">
-                  From URL to Video in <span className="gradient-text">4 Simple Steps</span>
-                </h3>
-                <div className="grid md:grid-cols-4 gap-6">
-                  {[
-                    { step: "1", title: "Paste URL", desc: "Drop any listing link from Zillow, Redfin, Realtor.com" },
-                    { step: "2", title: "AI Scrapes", desc: "Firecrawl extracts photos, price, beds, baths & features" },
-                    { step: "3", title: "Script & Voice", desc: "AI writes narration and generates professional voiceover" },
-                    { step: "4", title: "Render Video", desc: "Remotion creates a stunning video ready to share" },
-                  ].map((item, i) => (
-                    <div key={i} className="text-center relative">
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-violet-500 flex items-center justify-center text-xl font-bold mx-auto mb-4">
-                        {item.step}
-                      </div>
-                      <h4 className="font-semibold text-white mb-2">{item.title}</h4>
-                      <p className="text-sm text-white/50">{item.desc}</p>
-                      {i < 3 && (
-                        <ChevronRight className="hidden md:block absolute right-0 top-6 w-6 h-6 text-white/20" />
-                      )}
+            {/* Comparison */}
+            <section className="border-t border-white/[0.06] py-24">
+              <div className="max-w-[1280px] mx-auto px-6">
+                <div className="max-w-xl mb-16">
+                  <h2 className="text-sm font-medium text-white/40 uppercase tracking-wider mb-3">
+                    The strategic flip
+                  </h2>
+                  <p className="text-2xl md:text-3xl font-semibold leading-tight">
+                    Manual editing is linear. Agentic production is infinite.
+                  </p>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-px bg-white/[0.06] rounded-xl overflow-hidden">
+                  {/* Legacy */}
+                  <div className="bg-[#0A0A0A] p-8">
+                    <div className="text-xs font-medium text-white/30 uppercase tracking-wider mb-6">
+                      Legacy Model
                     </div>
-                  ))}
-                </div>
-              </div>
-            </>
-          ) : (
-            /* Dashboard View */
-            <div className="space-y-8">
-              {/* Quick Stats */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {[
-                  { label: "Videos This Month", value: "24", change: "+12%", icon: Video },
-                  { label: "Total Views", value: "18.4K", change: "+28%", icon: Play },
-                  { label: "Leads Generated", value: "142", change: "+45%", icon: Users },
-                  { label: "Avg. Watch Time", value: "42s", change: "+8%", icon: Clock },
-                ].map((stat, i) => {
-                  const Icon = stat.icon;
-                  return (
-                    <div key={i} className="glass-panel p-6">
-                      <div className="flex items-center justify-between mb-4">
-                        <Icon className="w-5 h-5 text-white/40" />
-                        <span className="text-xs text-green-400 font-semibold">{stat.change}</span>
-                      </div>
-                      <p className="text-3xl font-bold text-white mb-1">{stat.value}</p>
-                      <p className="text-sm text-white/40">{stat.label}</p>
+                    <ul className="space-y-4">
+                      {[
+                        "Hours of manual keyframing",
+                        "High headcount & agency fees",
+                        "Linear scaling (more content = more staff)",
+                        "Static, brittle video files",
+                      ].map((item, i) => (
+                        <li key={i} className="flex items-start gap-3 text-white/40">
+                          <div className="w-1.5 h-1.5 rounded-full bg-white/20 mt-2 shrink-0" />
+                          <span className="text-sm">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Agentic */}
+                  <div className="bg-emerald-400/[0.03] p-8 border-l border-emerald-400/20">
+                    <div className="text-xs font-medium text-emerald-400 uppercase tracking-wider mb-6">
+                      Agentic Model
                     </div>
-                  );
-                })}
-              </div>
-
-              {/* Recent Videos */}
-              <div className="glass-panel p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-lg font-semibold">Recent Videos</h3>
-                  <button className="text-sm text-cyan-400 hover:text-cyan-300 flex items-center gap-1">
-                    View All <ArrowRight className="w-4 h-4" />
-                  </button>
-                </div>
-                <div className="grid md:grid-cols-3 gap-4">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="bg-white/5 rounded-xl overflow-hidden hover:bg-white/10 transition-all cursor-pointer">
-                      <div className="aspect-video bg-gradient-to-br from-cyan-500/20 to-violet-500/20 flex items-center justify-center">
-                        <Play className="w-12 h-12 text-white/30" />
-                      </div>
-                      <div className="p-4">
-                        <h4 className="font-semibold text-white mb-1">123 Beacon St, Boston</h4>
-                        <div className="flex items-center justify-between text-xs text-white/40">
-                          <span>Property Showcase</span>
-                          <span>2 days ago</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                    <ul className="space-y-4">
+                      {[
+                        "Minutes via natural language",
+                        "Fixed API & compute costs",
+                        "Infinite scaling (data-driven automation)",
+                        "Reusable, modular React components",
+                      ].map((item, i) => (
+                        <li key={i} className="flex items-start gap-3">
+                          <Check className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
+                          <span className="text-sm">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
               </div>
+            </section>
 
-              {/* Quick Actions */}
-              <div className="grid md:grid-cols-3 gap-4">
-                <button
-                  onClick={() => setActiveTab("studio")}
-                  className="glass-panel p-6 text-left hover:bg-white/5 transition-all group"
-                >
-                  <Video className="w-8 h-8 text-cyan-400 mb-4 group-hover:scale-110 transition-transform" />
-                  <h4 className="font-semibold text-white mb-2">Create New Video</h4>
-                  <p className="text-sm text-white/50">Generate a stunning property video from any listing URL</p>
-                </button>
-                <div className="glass-panel p-6 text-left hover:bg-white/5 transition-all group cursor-pointer">
-                  <Target className="w-8 h-8 text-violet-400 mb-4 group-hover:scale-110 transition-transform" />
-                  <h4 className="font-semibold text-white mb-2">Market Analytics</h4>
-                  <p className="text-sm text-white/50">View real-time market data and trends for your area</p>
+            {/* Pricing */}
+            <section className="border-t border-white/[0.06] py-24">
+              <div className="max-w-[1280px] mx-auto px-6">
+                <div className="text-center mb-16">
+                  <h2 className="text-2xl md:text-3xl font-semibold mb-3">
+                    Simple, transparent pricing
+                  </h2>
+                  <p className="text-white/40">
+                    Start free. Scale as you grow.
+                  </p>
                 </div>
-                <div className="glass-panel p-6 text-left hover:bg-white/5 transition-all group cursor-pointer">
-                  <Share2 className="w-8 h-8 text-pink-400 mb-4 group-hover:scale-110 transition-transform" />
-                  <h4 className="font-semibold text-white mb-2">Social Scheduler</h4>
-                  <p className="text-sm text-white/50">Schedule and auto-post videos to your social channels</p>
-                </div>
-              </div>
 
-              {/* Pricing Section */}
-              <div className="mt-8">
-                <h3 className="text-2xl font-bold text-center mb-2">
-                  <span className="gradient-text">Upgrade Your Plan</span>
-                </h3>
-                <p className="text-white/50 text-center mb-8">Choose the plan that fits your business</p>
-                <div className="grid md:grid-cols-3 gap-6">
-                  {PRICING.map((plan, i) => (
+                <div className="grid md:grid-cols-3 gap-px bg-white/[0.06] rounded-2xl overflow-hidden max-w-4xl mx-auto">
+                  {PLANS.map((plan, i) => (
                     <div
                       key={i}
-                      className={`glass-panel p-6 relative ${
-                        plan.popular ? "border-cyan-500/50 shadow-lg shadow-cyan-500/10" : ""
-                      }`}
+                      className={`p-8 ${plan.featured ? 'bg-white/[0.04]' : 'bg-[#0A0A0A]'}`}
                     >
-                      {plan.popular && (
-                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-gradient-to-r from-cyan-500 to-violet-500 rounded-full text-xs font-bold">
-                          Most Popular
+                      {plan.featured && (
+                        <div className="text-xs font-medium text-cyan-400 uppercase tracking-wider mb-4">
+                          Most popular
                         </div>
                       )}
-                      <h4 className="text-xl font-bold text-white mb-2">{plan.name}</h4>
-                      <div className="flex items-baseline gap-1 mb-6">
-                        <span className="text-4xl font-bold gradient-text">{plan.price}</span>
-                        <span className="text-white/40">{plan.period}</span>
+                      <div className="mb-6">
+                        <h3 className="text-lg font-semibold mb-1">{plan.name}</h3>
+                        <p className="text-sm text-white/40">{plan.desc}</p>
                       </div>
-                      <ul className="space-y-3 mb-6">
+                      <div className="mb-6">
+                        <span className="text-4xl font-bold">
+                          {plan.price === "Custom" ? "" : "$"}{plan.price}
+                        </span>
+                        {plan.price !== "Custom" && (
+                          <span className="text-white/40">/mo</span>
+                        )}
+                      </div>
+                      <ul className="space-y-3 mb-8">
                         {plan.features.map((feature, j) => (
-                          <li key={j} className="flex items-center gap-2 text-sm text-white/70">
-                            <Zap className="w-4 h-4 text-cyan-400" />
+                          <li key={j} className="flex items-center gap-2 text-sm text-white/60">
+                            <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                             {feature}
                           </li>
                         ))}
                       </ul>
                       <button
-                        className={`w-full py-3 rounded-xl font-semibold transition-all ${
-                          plan.popular
-                            ? "bg-gradient-to-r from-cyan-500 to-violet-500 text-white hover:shadow-lg hover:shadow-cyan-500/30"
-                            : "bg-white/10 text-white hover:bg-white/20"
+                        className={`w-full py-2.5 rounded-lg text-sm font-semibold transition-colors ${
+                          plan.featured
+                            ? 'bg-white text-[#0A0A0A] hover:bg-white/90'
+                            : 'bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.08]'
                         }`}
                       >
-                        Get Started
+                        {plan.cta}
                       </button>
                     </div>
                   ))}
                 </div>
               </div>
-            </div>
-          )}
+            </section>
 
-          {/* Testimonials */}
-          {activeTab === "studio" && (
-            <div className="mb-12">
-              <h3 className="text-2xl font-bold text-center mb-8">
-                Trusted by <span className="gradient-text">Top Agents</span>
-              </h3>
-              <div className="grid md:grid-cols-3 gap-6">
-                {TESTIMONIALS.map((testimonial, i) => (
-                  <div key={i} className="glass-panel p-6">
-                    <div className="flex items-center gap-1 mb-4">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <Star key={star} className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                      ))}
-                    </div>
-                    <p className="text-white/70 mb-4 italic">"{testimonial.quote}"</p>
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-violet-500 flex items-center justify-center text-sm font-bold">
-                        {testimonial.avatar}
-                      </div>
-                      <div>
-                        <p className="font-semibold text-white text-sm">{testimonial.author}</p>
-                        <p className="text-xs text-white/40">{testimonial.role}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+            {/* CTA */}
+            <section className="border-t border-white/[0.06] py-24">
+              <div className="max-w-[1280px] mx-auto px-6 text-center">
+                <h2 className="text-2xl md:text-3xl font-semibold mb-4">
+                  Ready to automate your video production?
+                </h2>
+                <p className="text-white/40 mb-8 max-w-md mx-auto">
+                  Join 2,100+ real estate professionals who've made the switch.
+                </p>
+                <button
+                  onClick={() => setView("studio")}
+                  className="px-8 py-3 bg-white text-[#0A0A0A] rounded-lg font-semibold hover:bg-white/90 transition-colors inline-flex items-center gap-2"
+                >
+                  Open Video Studio <ArrowRight className="w-4 h-4" />
+                </button>
               </div>
-            </div>
-          )}
+            </section>
+          </div>
+        )}
+      </main>
 
-          {/* Footer CTA */}
-          <div className="glass-panel p-8 text-center bg-gradient-to-r from-cyan-500/10 via-violet-500/10 to-pink-500/10">
-            <h3 className="text-2xl font-bold mb-2">
-              Ready to <span className="gradient-text">Transform Your Listings</span>?
-            </h3>
-            <p className="text-white/50 mb-6">
-              Join 2,100+ real estate professionals creating stunning videos with AI
-            </p>
-            <div className="flex items-center justify-center gap-4">
-              <button
-                onClick={() => setActiveTab("studio")}
-                className="px-8 py-3 bg-gradient-to-r from-cyan-500 to-violet-500 rounded-xl font-semibold text-white hover:shadow-lg hover:shadow-cyan-500/30 transition-all flex items-center gap-2"
-              >
-                <Sparkles className="w-5 h-5" />
-                Start Creating Free
-              </button>
-              <button className="px-8 py-3 bg-white/10 rounded-xl font-semibold text-white hover:bg-white/20 transition-all">
-                Watch Demo
-              </button>
+      {/* Footer */}
+      <footer className="border-t border-white/[0.06] py-12">
+        <div className="max-w-[1280px] mx-auto px-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded bg-gradient-to-br from-emerald-400 to-cyan-400 flex items-center justify-center">
+                <span className="text-[#0A0A0A] font-bold text-[10px]">RE</span>
+              </div>
+              <span className="text-sm text-white/40">Real Easy Realty</span>
+            </div>
+            <div className="text-sm text-white/30">
+              © 2026 Real Easy Realty. Built with Remotion.
             </div>
           </div>
         </div>
-      </section>
+      </footer>
     </div>
   );
 }
