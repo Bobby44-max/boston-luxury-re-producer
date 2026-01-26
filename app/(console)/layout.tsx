@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import {
   LayoutDashboard,
   Video,
-  FolderVideo,
+  FileVideo,
   Settings,
   Sparkles,
   LogOut,
@@ -17,7 +17,7 @@ import {
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/studio", label: "Video Studio", icon: Video },
-  { href: "/videos", label: "My Videos", icon: FolderVideo },
+  { href: "/videos", label: "My Videos", icon: FileVideo },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
