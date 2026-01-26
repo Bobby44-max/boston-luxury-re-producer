@@ -93,13 +93,12 @@ export async function scrapeProperty(url: string): Promise<Property> {
   const firecrawl = getFirecrawlClient();
 
   try {
-    const result = await firecrawl.extract({
-      urls: [url],
+    const result = await firecrawl.extract([url], {
       prompt: PROPERTY_EXTRACTION_PROMPT,
       schema: PropertySchema,
     });
 
-    if (!result.data) {
+    if (!result.success || !result.data) {
       throw new Error('No data extracted from URL');
     }
 
@@ -116,13 +115,12 @@ export async function scrapeInsights(url: string): Promise<Insights> {
   const firecrawl = getFirecrawlClient();
 
   try {
-    const result = await firecrawl.extract({
-      urls: [url],
+    const result = await firecrawl.extract([url], {
       prompt: INSIGHTS_EXTRACTION_PROMPT,
       schema: InsightsSchema,
     });
 
-    if (!result.data) {
+    if (!result.success || !result.data) {
       throw new Error('No insights extracted from URL');
     }
 
