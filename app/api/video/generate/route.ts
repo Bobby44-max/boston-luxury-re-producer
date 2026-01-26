@@ -7,13 +7,23 @@ import { generateVideoScript } from '@/lib/services/gemini';
 import { generateVoiceover, type VoiceId } from '@/lib/services/openai';
 import { createClient } from '@supabase/supabase-js';
 
-// Initialize clients
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+// Lazy initialization to avoid build-time errors
+function getConvexClient() {
+  const url = process.env.NEXT_PUBLIC_CONVEX_URL;
+  if (!url) {
+    throw new Error('NEXT_PUBLIC_CONVEX_URL is not configured');
+  }
+  return new ConvexHttpClient(url);
+}
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+function getSupabaseClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) {
+    throw new Error('Supabase credentials not configured');
+  }
+  return createClient(url, key);
+}
 
 export interface GenerateVideoRequest {
   listingUrl: string;
@@ -54,6 +64,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create job in Convex
+    const convex = getConvexClient();
     const jobId = await convex.mutation(api.videos.createJob, {
       userId,
       listingUrl,
@@ -92,6 +103,9 @@ async function processVideoGeneration(
   branding: GenerateVideoRequest['branding'],
   userId: string
 ) {
+  const convex = getConvexClient();
+  const supabase = getSupabaseClient();
+
   try {
     // Step 1: Scrape property data
     await convex.mutation(api.videos.updateProgress, {

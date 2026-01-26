@@ -3,7 +3,14 @@ import { auth } from '@clerk/nextjs/server';
 import { ConvexHttpClient } from 'convex/browser';
 import { api } from '@/convex/_generated/api';
 
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+// Lazy initialization to avoid build-time errors
+function getConvexClient() {
+  const url = process.env.NEXT_PUBLIC_CONVEX_URL;
+  if (!url) {
+    throw new Error('NEXT_PUBLIC_CONVEX_URL is not configured');
+  }
+  return new ConvexHttpClient(url);
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -20,6 +27,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Job ID is required' }, { status: 400 });
     }
 
+    const convex = getConvexClient();
     const job = await convex.query(api.videos.get, { id: jobId as any });
 
     if (!job) {
