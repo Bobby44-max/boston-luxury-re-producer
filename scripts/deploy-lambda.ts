@@ -22,6 +22,33 @@ const REGION = 'us-east-1'; // Change to your preferred region
 const RAM = 2048; // MB - increase for faster renders
 const TIMEOUT = 240; // seconds
 
+// Helper to wait for IAM role propagation
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function deployWithRetry(maxRetries = 3): Promise<{ functionName: string; alreadyExisted: boolean }> {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const result = await deployFunction({
+        region: REGION,
+        timeoutInSeconds: TIMEOUT,
+        memorySizeInMb: RAM,
+        createCloudWatchLogGroup: true,
+      });
+      return result;
+    } catch (error: any) {
+      if (error.message?.includes('cannot be assumed by Lambda') && attempt < maxRetries) {
+        console.log(`   ⏳ Waiting for IAM role to propagate (attempt ${attempt}/${maxRetries})...`);
+        await sleep(10000); // Wait 10 seconds for role propagation
+      } else {
+        throw error;
+      }
+    }
+  }
+  throw new Error('Failed to deploy Lambda function after retries');
+}
+
 async function deploy() {
   console.log('🚀 Starting Remotion Lambda deployment...\n');
 
@@ -42,14 +69,9 @@ async function deploy() {
   });
   console.log(`   Serve URL: ${serveUrl}\n`);
 
-  // Step 3: Deploy the Lambda function
+  // Step 3: Deploy the Lambda function (with retry for IAM propagation)
   console.log('⚡ Deploying Lambda function...');
-  const { functionName, alreadyExisted } = await deployFunction({
-    region: REGION,
-    timeoutInSeconds: TIMEOUT,
-    memorySizeInMb: RAM,
-    createCloudWatchLogGroup: true,
-  });
+  const { functionName, alreadyExisted } = await deployWithRetry(3);
   console.log(`   Function: ${functionName}`);
   console.log(`   Status: ${alreadyExisted ? 'Updated' : 'Created'}\n`);
 
