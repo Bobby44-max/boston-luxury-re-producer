@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { auth } from "@clerk/nextjs/server";
 
 export async function GET(request: NextRequest) {
   // Check authentication
-  const session = await getServerSession();
-  if (!session) {
+  const { userId } = await auth();
+  if (!userId) {
     return NextResponse.json(
       { success: false, error: "Unauthorized" },
       { status: 401 }
