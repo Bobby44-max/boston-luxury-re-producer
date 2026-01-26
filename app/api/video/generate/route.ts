@@ -6,6 +6,7 @@ import { scrapeProperty, selectBestImages } from '@/lib/services/firecrawl';
 import { generateVideoScript } from '@/lib/services/gemini';
 import { generateVoiceover, type VoiceId } from '@/lib/services/openai';
 import { createClient } from '@supabase/supabase-js';
+import { renderVideo, type RenderOptions } from '@/lib/services/remotion-lambda';
 
 // Lazy initialization to avoid build-time errors
 function getConvexClient() {
@@ -187,24 +188,61 @@ async function processVideoGeneration(
       });
     }
 
-    // Step 4: Render video with Remotion
+    // Step 4: Render video with Remotion Lambda
     await convex.mutation(api.videos.updateProgress, {
       id: jobId as any,
       status: 'rendering',
       progress: 70,
     });
 
-    // In production, trigger Remotion Lambda here
-    // For now, we'll simulate the render completion
-    // const videoUrl = await renderWithRemotion({ ... });
+    // Map video type to Remotion composition
+    const compositionMap: Record<string, RenderOptions['compositionId']> = {
+      'property-showcase': 'PropertyShowcase',
+      'social-short': 'SocialShort',
+      'market-stats': 'MarketStats',
+      'just-listed': 'JustListed',
+    };
 
-    // Simulate render completion (replace with actual Remotion integration)
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    // Render with Remotion Lambda
+    const videoUrl = await renderVideo(
+      {
+        compositionId: compositionMap[videoType] || 'PropertyShowcase',
+        inputProps: {
+          address: propertyData.address,
+          city: propertyData.city,
+          state: propertyData.state,
+          price: propertyData.price,
+          bedrooms: propertyData.bedrooms,
+          bathrooms: propertyData.bathrooms,
+          sqft: propertyData.sqft,
+          description: propertyData.description,
+          features: propertyData.features,
+          images: bestImages,
+          narration: script.narration,
+          scenes: script.scenes,
+          voiceoverUrl,
+          agentName: branding?.agentName,
+          brokerageName: branding?.brokerageName,
+          phone: branding?.phone,
+          logoUrl: branding?.logoUrl,
+          primaryColor: branding?.primaryColor,
+        },
+      },
+      async (progress) => {
+        // Update progress during render (70-95%)
+        const renderProgress = 70 + Math.round(progress * 0.25);
+        await convex.mutation(api.videos.updateProgress, {
+          id: jobId as any,
+          status: 'rendering',
+          progress: renderProgress,
+        });
+      }
+    );
 
-    // Mark as complete with placeholder URL
+    // Mark as complete with actual video URL
     await convex.mutation(api.videos.complete, {
       id: jobId as any,
-      videoUrl: `https://storage.example.com/videos/${jobId}.mp4`,
+      videoUrl,
       thumbnailUrl: bestImages[0],
       duration,
     });
