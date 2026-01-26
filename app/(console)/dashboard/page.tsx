@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
 import {
   Video,
-  FolderVideo,
+  FileVideo,
   TrendingUp,
   Clock,
   ArrowRight,
@@ -96,7 +96,7 @@ export default function DashboardPage() {
         >
           <div className="flex items-center gap-4 mb-4">
             <div className="w-12 h-12 rounded-xl bg-white/[0.04] flex items-center justify-center">
-              <FolderVideo className="w-6 h-6 text-white/60" />
+              <FileVideo className="w-6 h-6 text-white/60" />
             </div>
             <div>
               <h3 className="font-semibold text-lg">My Videos</h3>
@@ -147,7 +147,7 @@ export default function DashboardPage() {
 
         {RECENT_VIDEOS.length === 0 && (
           <div className="text-center py-12 text-white/40">
-            <FolderVideo className="w-12 h-12 mx-auto mb-4 opacity-30" />
+            <FileVideo className="w-12 h-12 mx-auto mb-4 opacity-30" />
             <p>No videos yet. Create your first one!</p>
           </div>
         )}

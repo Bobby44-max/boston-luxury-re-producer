@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import {
-  FolderVideo,
+  FileVideo,
   Play,
   Download,
   Trash2,
@@ -119,7 +119,7 @@ export default function VideosPage() {
       {/* Empty State */}
       {filteredVideos.length === 0 && (
         <div className="text-center py-16">
-          <FolderVideo className="w-16 h-16 mx-auto mb-4 text-white/10" />
+          <FileVideo className="w-16 h-16 mx-auto mb-4 text-white/10" />
           <h3 className="text-lg font-medium mb-2">No videos found</h3>
           <p className="text-white/40">
             {searchQuery ? "Try a different search term" : "Create your first video to get started"}
