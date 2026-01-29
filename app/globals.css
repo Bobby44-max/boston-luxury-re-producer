@@ -2,16 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Syne:wght@600;700;800&display=swap');
+
 :root {
-  --glass-bg: #09090b;
-  --glass-card: rgba(255, 255, 255, 0.03);
-  --glass-border: rgba(255, 255, 255, 0.06);
-  --glass-hover: rgba(255, 255, 255, 0.08);
-  --accent-cyan: #0dccf2;
-  --accent-violet: #8b5cf6;
-  --accent-orange: #f97316;
-  --accent-pink: #ec4899;
-  --accent-green: #22c55e;
+  --luxury-black: #050505;
+  --luxury-gold: #EAB308;
+  --luxury-gold-glow: rgba(234, 179, 8, 0.4);
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-blur: blur(20px);
+  --aura-cyan: rgba(13, 204, 242, 0.1);
+  --aura-gold: rgba(234, 179, 8, 0.15);
 }
 
 * {
@@ -20,11 +21,74 @@
 
 body {
   font-family: "Plus Jakarta Sans", system-ui, sans-serif;
-  background-color: var(--glass-bg);
-  color: #ffffff;
+  background-color: var(--luxury-black);
+  color: #FAFAFA;
   overflow-x: hidden;
   min-height: 100vh;
 }
+
+/* Luxury Typography */
+h1,
+h2,
+h3,
+.font-syne {
+  font-family: 'Syne', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* Aura Glows */
+.aura-glow-gold {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, var(--aura-gold) 0%, transparent 70%);
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.aura-glow-cyan {
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, var(--aura-cyan) 0%, transparent 70%);
+  filter: blur(60px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Glassmorphism Ultra */
+.glass-panel-ultra {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 32px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+.glass-card-luxury {
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 24px;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.glass-card-luxury:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--luxury-gold);
+  transform: translateY(-4px);
+}
+
+/* Gold Gradient Text */
+.gradient-gold {
+  background: linear-gradient(135deg, #FDE68A 0%, #EAB308 50%, #B45309 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 
 html {
   scroll-behavior: smooth;
@@ -56,11 +120,9 @@ html {
 .gradient-cyan {
   width: 600px;
   height: 600px;
-  background: radial-gradient(
-    circle,
-    rgba(13, 204, 242, 0.15) 0%,
-    transparent 70%
-  );
+  background: radial-gradient(circle,
+      rgba(13, 204, 242, 0.15) 0%,
+      transparent 70%);
   top: -200px;
   right: -100px;
 }
@@ -68,11 +130,9 @@ html {
 .gradient-violet {
   width: 500px;
   height: 500px;
-  background: radial-gradient(
-    circle,
-    rgba(139, 92, 246, 0.12) 0%,
-    transparent 70%
-  );
+  background: radial-gradient(circle,
+      rgba(139, 92, 246, 0.12) 0%,
+      transparent 70%);
   bottom: 100px;
   left: -150px;
 }
@@ -80,11 +140,9 @@ html {
 .gradient-orange {
   width: 400px;
   height: 400px;
-  background: radial-gradient(
-    circle,
-    rgba(249, 115, 22, 0.1) 0%,
-    transparent 70%
-  );
+  background: radial-gradient(circle,
+      rgba(249, 115, 22, 0.1) 0%,
+      transparent 70%);
   top: 40%;
   right: -100px;
 }
@@ -104,12 +162,10 @@ html {
 
 /* Gradient Text */
 .gradient-text {
-  background: linear-gradient(
-    135deg,
-    var(--accent-cyan) 0%,
-    var(--accent-violet) 50%,
-    var(--accent-orange) 100%
-  );
+  background: linear-gradient(135deg,
+      var(--accent-cyan) 0%,
+      var(--accent-violet) 50%,
+      var(--accent-orange) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -194,11 +250,13 @@ html {
 }
 
 @keyframes pulse {
+
   0%,
   100% {
     opacity: 1;
     transform: scale(1);
   }
+
   50% {
     opacity: 0.5;
     transform: scale(1.2);
@@ -329,6 +387,7 @@ html {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -344,6 +403,7 @@ html {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
