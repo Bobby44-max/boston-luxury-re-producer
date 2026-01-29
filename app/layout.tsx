@@ -66,7 +66,7 @@ export default function RootLayout({
 
                 {/* Nav Links */}
                 <nav className="hidden md:flex items-center gap-8">
-                  <Link href="/tools" className="text-xs font-bold uppercase tracking-widest text-white/40 hover:text-white transition-colors">
+                  <Link href="/studio" className="text-xs font-bold uppercase tracking-widest text-white/40 hover:text-white transition-colors">
                     Intelligence
                   </Link>
                   <Link href="/" className="text-xs font-bold uppercase tracking-widest text-white/40 hover:text-white transition-colors">
