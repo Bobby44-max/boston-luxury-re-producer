@@ -1,22 +1,28 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Plus_Jakarta_Sans, Syne } from "next/font/google";
 import "./globals.css";
-import { ClerkProvider } from "@clerk/nextjs";
+import {
+  ClerkProvider,
+  SignInButton,
+  SignUpButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from "@clerk/nextjs";
 import { ConvexClientProvider } from "@/components/ConvexProvider";
 import Link from "next/link";
 import { Sparkles } from "lucide-react";
-import {
-  SignedIn,
-  SignedOut,
-  SignInButton,
-  SignUpButton,
-  UserButton,
-} from "@clerk/nextjs";
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800"],
   variable: "--font-plus-jakarta",
+});
+
+const syne = Syne({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-syne",
 });
 
 export const metadata: Metadata = {
@@ -38,7 +44,7 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en" className="dark">
-        <body className={`${plusJakarta.variable} font-sans antialiased bg-[#0A0A0A]`}>
+        <body className={`${plusJakarta.variable} ${syne.variable} font-sans antialiased bg-[#0A0A0A]`}>
           <ConvexClientProvider>
             {/* Global Header */}
             <header className="fixed top-0 left-0 right-0 z-50 px-6 py-3 bg-black/50 backdrop-blur-xl border-b border-white/5">
@@ -113,10 +119,3 @@ export default function RootLayout({
     </ClerkProvider>
   );
 }
-          </ConvexClientProvider >
-        </body >
-      </html >
-    </ClerkProvider >
-  );
-}
-// Trigger redeploy: Thu, Jan 29, 2026 12:29:49 AM
