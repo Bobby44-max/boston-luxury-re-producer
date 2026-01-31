@@ -278,7 +278,7 @@ export default function MarketingHomePage() {
                   ))}
                 </ul>
                 <Link
-                  href="/dashboard"
+                  href="/studio"
                   className={`block w-full py-5 rounded-2xl font-bold uppercase tracking-widest text-xs transition-all text-center ${plan.featured
                     ? 'bg-white text-black hover:bg-neutral-200 shadow-xl'
                     : 'bg-white/5 border border-white/10 hover:bg-white/10 text-white/80'
@@ -304,7 +304,7 @@ export default function MarketingHomePage() {
               Secure your competitive edge in the luxury indices.
             </p>
             <Link
-              href="/dashboard"
+              href="/studio"
               className="px-12 py-6 bg-black text-white rounded-full font-bold uppercase tracking-[0.3em] text-xs hover:scale-105 transition-transform inline-flex items-center gap-3"
             >
               Acquire Access <ArrowRight className="w-4 h-4" />
