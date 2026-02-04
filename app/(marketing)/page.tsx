@@ -97,8 +97,8 @@ export default function MarketingHomePage() {
   return (
     <div className="relative min-h-screen bg-black text-white selection:bg-white/10">
       {/* Hero Section */}
-      <section className="relative pt-64 pb-40 px-8">
-        <div className="max-w-7xl mx-auto text-center">
+      <section className="relative pt-32 pb-20 px-8 flex flex-col items-center justify-center text-center overflow-hidden">
+        <div className="max-w-6xl mx-auto items-center justify-center flex flex-col relative z-10 reveal">
           <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold uppercase tracking-[0.3em] reveal mb-10 text-white/60">
             <Sparkles className="w-4 h-4 text-amber-500" />
             Intelligence Layer v4.0
@@ -125,7 +125,7 @@ export default function MarketingHomePage() {
       </section>
 
       {/* Metrics Section */}
-      <section className="py-20 px-8">
+      <section className="py-24 px-8 relative overflow-hidden backdrop-blur-sm">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-1 px-1 bg-white/5 rounded-[48px] overflow-hidden premium-glass border-white/5 shadow-2xl">
             {METRICS.map((metric, i) => (
@@ -139,7 +139,7 @@ export default function MarketingHomePage() {
       </section>
 
       {/* Feature Bento Grid */}
-      <section className="py-40 px-8">
+      <section className="py-32 px-8 relative backdrop-blur-[2px]">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-end mb-24 gap-8 reveal">
             <div>
@@ -170,7 +170,7 @@ export default function MarketingHomePage() {
       </section>
 
       {/* Process Section */}
-      <section className="py-40 px-8 border-t border-white/5">
+      <section className="py-32 px-8 relative overflow-hidden backdrop-blur-sm">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 gap-24 items-center">
             <div className="reveal">

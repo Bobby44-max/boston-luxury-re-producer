@@ -44,7 +44,9 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en" className="dark">
-        <body className={`${plusJakarta.variable} ${syne.variable} font-sans antialiased bg-black selection:bg-white/10`}>
+        <body className={`${plusJakarta.variable} ${syne.variable} font-sans antialiased bg-black text-white selection:bg-accent-indigo/30`}>
+          <div className="boston-bg-overlay" />
+
           <ConvexClientProvider>
             {/* Global Header */}
             <header className="fixed top-0 left-0 right-0 z-50 px-8 py-4 bg-black/20 backdrop-blur-md border-b border-white/5">
