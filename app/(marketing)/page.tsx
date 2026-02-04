@@ -95,7 +95,7 @@ export default function MarketingHomePage() {
   }, []);
 
   return (
-    <div className="relative min-h-screen bg-black text-white selection:bg-white/10">
+    <div className="relative min-h-screen bg-transparent text-white selection:bg-white/10">
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 px-8 flex flex-col items-center justify-center text-center overflow-hidden">
         <div className="max-w-6xl mx-auto items-center justify-center flex flex-col relative z-10 reveal">
