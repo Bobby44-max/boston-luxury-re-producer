@@ -107,13 +107,13 @@ export default function StudioPage() {
 
       <div className="grid lg:grid-cols-2 gap-12">
         {/* Input Panel */}
-        <div className="glass-panel-ultra p-10 border-white/5 bg-white/[0.01]">
+        <div className="premium-glass p-10 reveal">
           <div className="flex items-center gap-5 mb-10">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-yellow-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
-              <Video className="w-7 h-7 text-black" />
+            <div className="w-14 h-14 rounded-2xl bg-accent-indigo flex items-center justify-center shadow-lg shadow-accent-indigo/20">
+              <Video className="w-7 h-7 text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold font-syne tracking-tight uppercase">AI Digital <span className="text-amber-500">Twin</span></h2>
+              <h2 className="text-2xl font-bold font-syne tracking-tight uppercase">AI Digital <span className="text-accent-indigo">Twin</span></h2>
               <p className="text-xs font-bold tracking-widest text-white/30 uppercase mt-1">Powered by HeyGen Engine</p>
             </div>
           </div>
@@ -127,7 +127,7 @@ export default function StudioPage() {
               value={script}
               onChange={(e) => setScript(e.target.value)}
               placeholder="Define the narrative... (e.g., 'Discover an unparalleled architectural masterpiece...')"
-              className="glass-input w-full h-48 resize-none bg-white/[0.02] border-white/10 rounded-2xl focus:border-amber-500 transition-all font-medium py-6 px-8"
+              className="glass-input w-full h-48 resize-none bg-white/[0.02] border-white/10 rounded-2xl focus:border-accent-indigo transition-all font-medium py-6 px-8"
               maxLength={1000}
             />
             <div className="flex justify-between items-center mt-3">
@@ -136,7 +136,7 @@ export default function StudioPage() {
               </p>
               <div className="h-[2px] w-24 bg-white/5 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-amber-500 transition-all duration-300"
+                  className="h-full bg-accent-indigo transition-all duration-300"
                   style={{ width: `${(script.length / 1000) * 100}%` }}
                 />
               </div>
@@ -154,16 +154,16 @@ export default function StudioPage() {
                   key={avatar.id}
                   onClick={() => setSelectedAvatar(avatar.id)}
                   className={`p-6 rounded-2xl border transition-all text-left group relative overflow-hidden ${selectedAvatar === avatar.id
-                    ? "bg-amber-500/10 border-amber-500"
+                    ? "bg-accent-indigo/10 border-accent-indigo"
                     : "bg-white/[0.02] border-white/5 hover:border-white/20"
                     }`}
                 >
-                  <User className={`w-8 h-8 mb-4 transition-colors ${selectedAvatar === avatar.id ? "text-amber-500" : "text-white/20"}`} />
+                  <User className={`w-8 h-8 mb-4 transition-colors ${selectedAvatar === avatar.id ? "text-accent-indigo" : "text-white/20"}`} />
                   <p className="font-bold text-sm tracking-tight">{avatar.name}</p>
                   <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest mt-1">{avatar.style}</p>
                   {selectedAvatar === avatar.id && (
                     <div className="absolute top-0 right-0 p-3">
-                      <Sparkles className="w-3 h-3 text-amber-500" />
+                      <Sparkles className="w-3 h-3 text-accent-indigo" />
                     </div>
                   )}
                 </button>
@@ -182,11 +182,11 @@ export default function StudioPage() {
                   key={voice.id}
                   onClick={() => setSelectedVoice(voice.id)}
                   className={`p-5 rounded-2xl border transition-all text-left flex items-center gap-4 ${selectedVoice === voice.id
-                    ? "bg-amber-500/10 border-amber-500"
+                    ? "bg-accent-indigo/10 border-accent-indigo"
                     : "bg-white/[0.02] border-white/5 hover:border-white/20"
                     }`}
                 >
-                  <div className={`p-2 rounded-lg transition-colors ${selectedVoice === voice.id ? "bg-amber-500 text-black" : "bg-white/5 text-white/20"}`}>
+                  <div className={`p-2 rounded-lg transition-colors ${selectedVoice === voice.id ? "bg-accent-indigo text-white" : "bg-white/5 text-white/20"}`}>
                     <Volume2 className="w-4 h-4" />
                   </div>
                   <div>
@@ -202,10 +202,9 @@ export default function StudioPage() {
           <button
             onClick={handleGenerate}
             disabled={isGenerating || !script.trim()}
-            className="w-full py-5 rounded-2xl font-bold uppercase tracking-[0.2em] text-sm transition-all relative overflow-hidden group disabled:opacity-30 disabled:cursor-not-allowed"
+            className="btn-premium-solid w-full"
           >
-            <div className="absolute inset-0 bg-white group-hover:bg-neutral-200 transition-colors" />
-            <div className="relative flex items-center justify-center gap-3 text-black">
+            <div className="relative flex items-center justify-center gap-3">
               {isGenerating ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
@@ -213,7 +212,7 @@ export default function StudioPage() {
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-5 h-5 text-amber-600" />
+                  <Sparkles className="w-5 h-5" />
                   Commence Generation
                 </>
               )}
@@ -232,7 +231,7 @@ export default function StudioPage() {
           <div className="mb-6 flex justify-between items-center">
             <h3 className="text-xs uppercase font-bold tracking-[0.2em] text-white/30">Asset Preview</h3>
             <div className="flex gap-2">
-              <div className="w-2 h-2 rounded-full bg-amber-500" />
+              <div className="w-2 h-2 rounded-full bg-accent-indigo" />
               <div className="w-2 h-2 rounded-full bg-white/10" />
               <div className="w-2 h-2 rounded-full bg-white/10" />
             </div>
@@ -242,8 +241,8 @@ export default function StudioPage() {
             {isGenerating ? (
               <div className="text-center relative z-10">
                 <div className="relative mb-6">
-                  <div className="absolute inset-0 bg-amber-500/20 blur-3xl animate-pulse" />
-                  <Loader2 className="w-16 h-16 text-amber-500 animate-spin mx-auto relative z-10" />
+                  <div className="absolute inset-0 bg-accent-indigo/20 blur-3xl animate-pulse" />
+                  <Loader2 className="w-16 h-16 text-accent-indigo animate-spin mx-auto relative z-10" />
                 </div>
                 <p className="text-lg font-syne font-bold uppercase tracking-widest">Synthesizing Luxury</p>
                 <p className="text-[10px] text-white/20 font-bold uppercase tracking-[0.3em] mt-3">Est. Time: 60-180s</p>
@@ -258,7 +257,7 @@ export default function StudioPage() {
             ) : (
               <div className="text-center group-hover:scale-105 transition-transform duration-700">
                 <div className="w-24 h-24 rounded-full border border-white/5 flex items-center justify-center mx-auto mb-6 bg-white/[0.02]">
-                  <Play className="w-8 h-8 text-white/10 group-hover:text-amber-500 transition-colors" />
+                  <Play className="w-8 h-8 text-white/10 group-hover:text-accent-indigo transition-colors" />
                 </div>
                 <p className="text-sm font-bold uppercase tracking-[0.2em] text-white/20">Await selection</p>
               </div>
@@ -272,18 +271,18 @@ export default function StudioPage() {
             <a
               href={videoUrl}
               download="luxury-asset.mp4"
-              className="mt-8 flex items-center justify-center gap-3 py-5 rounded-2xl bg-white/5 border border-white/10 text-white font-bold uppercase tracking-widest text-xs hover:bg-white/10 transition-all"
+              className="btn-premium-solid mt-8 text-xs h-14"
             >
-              <Download className="w-4 h-4 text-amber-500" />
+              <Download className="w-4 h-4" />
               Archive Intelligence
             </a>
           )}
 
-          <div className="mt-8 p-6 rounded-2xl bg-amber-500/5 border border-amber-500/10">
+          <div className="mt-8 p-6 premium-glass border-accent-indigo/10">
             <div className="flex items-start gap-4">
-              <Sparkles className="w-5 h-5 text-amber-500 mt-1" />
+              <Sparkles className="w-5 h-5 text-accent-indigo mt-1" />
               <div>
-                <h4 className="text-xs font-bold uppercase tracking-widest text-amber-500">Aura Pro-Tip</h4>
+                <h4 className="text-xs font-bold uppercase tracking-widest text-accent-indigo">Aura Pro-Tip</h4>
                 <p className="text-sm text-white/40 mt-1">High-fidelity renders are optimized for theatre viewing. Ensure your narrative aligns with the luxury archetype for maximum conversion.</p>
               </div>
             </div>

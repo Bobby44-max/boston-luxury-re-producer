@@ -43,7 +43,7 @@ export default function DashboardPage() {
         </div>
         <Link
           href="/studio"
-          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-semibold rounded-xl hover:opacity-90 transition-opacity"
+          className="btn-premium-solid"
         >
           <Sparkles className="w-4 h-4" />
           Create New Video
@@ -57,16 +57,16 @@ export default function DashboardPage() {
           return (
             <div
               key={i}
-              className="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.12] transition-colors"
+              className="p-6 premium-glass reveal"
             >
               <div className="flex items-start justify-between mb-4">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 flex items-center justify-center">
-                  <Icon className="w-5 h-5 text-emerald-400" />
+                <div className="w-10 h-10 rounded-xl bg-accent-indigo/10 flex items-center justify-center">
+                  <Icon className="w-5 h-5 text-accent-indigo" />
                 </div>
               </div>
               <div className="text-3xl font-bold mb-1">{stat.value}</div>
               <div className="text-sm text-white/40">{stat.label}</div>
-              <div className="text-xs text-emerald-400 mt-2">{stat.change}</div>
+              <div className="text-xs text-accent-indigo mt-2">{stat.change}</div>
             </div>
           );
         })}
@@ -76,10 +76,10 @@ export default function DashboardPage() {
       <div className="grid md:grid-cols-2 gap-4">
         <Link
           href="/studio"
-          className="group p-6 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 border border-emerald-500/20 hover:border-emerald-500/40 transition-all"
+          className="group p-6 premium-glass border-accent-indigo/20 hover:border-accent-indigo/40 reveal"
         >
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-accent-indigo flex items-center justify-center">
               <Video className="w-6 h-6 text-white" />
             </div>
             <div>
@@ -92,7 +92,7 @@ export default function DashboardPage() {
 
         <Link
           href="/videos"
-          className="group p-6 rounded-2xl bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.12] transition-all"
+          className="group p-6 premium-glass reveal"
         >
           <div className="flex items-center gap-4 mb-4">
             <div className="w-12 h-12 rounded-xl bg-white/[0.04] flex items-center justify-center">
@@ -120,7 +120,7 @@ export default function DashboardPage() {
           {RECENT_VIDEOS.map((video) => (
             <div
               key={video.id}
-              className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.12] transition-colors"
+              className="flex items-center gap-4 p-4 premium-glass reveal"
             >
               {/* Thumbnail */}
               <div className="w-24 h-14 rounded-lg bg-white/[0.04] flex items-center justify-center shrink-0">
@@ -134,11 +134,10 @@ export default function DashboardPage() {
               </div>
 
               {/* Status */}
-              <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-                video.status === "completed"
-                  ? "bg-emerald-500/20 text-emerald-400"
-                  : "bg-amber-500/20 text-amber-400"
-              }`}>
+              <div className={`px-3 py-1 rounded-full text-xs font-medium ${video.status === "completed"
+                  ? "bg-accent-indigo/20 text-accent-indigo"
+                  : "bg-accent-rose/20 text-accent-rose"
+                }`}>
                 {video.status === "completed" ? "Ready" : "Rendering..."}
               </div>
             </div>
