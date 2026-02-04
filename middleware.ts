@@ -13,8 +13,21 @@ const isProtectedRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware((auth, request) => {
-  // Protect console routes - Clerk handles redirect automatically
+  // Protect console routes
   if (isProtectedRoute(request)) {
+    // Check if it's an RSC/Fetch request (which Clerk redirects can break via CORS)
+    const isRscRequest =
+      request.headers.get('rsc') === '1' ||
+      request.headers.get('accept')?.includes('text/x-component') ||
+      request.headers.get('x-requested-with') === 'XMLHttpRequest';
+
+    if (isRscRequest) {
+      const { userId } = auth();
+      if (!userId) {
+        return new Response('Unauthorized', { status: 401 });
+      }
+    }
+
     auth().protect();
   }
 });
