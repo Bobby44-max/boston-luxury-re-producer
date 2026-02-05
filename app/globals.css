@@ -273,12 +273,10 @@ h3,
   position: fixed;
   inset: 0;
   z-index: 0;
-  /* Changed from -1 to avoid being covered by body bg */
-  background-image: var(--boston-skyline);
+  background-image: url('/boston_skyline.png');
   background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  transition: background-image 1.5s ease-in-out;
+  background-position: center bottom;
+  background-repeat: no-repeat;
 }
 
 .boston-bg-overlay::after {
@@ -293,11 +291,11 @@ h3,
 }
 
 .bg-seaport {
-  background-image: var(--boston-seaport);
+  background-image: url('/boston_seaport.png');
 }
 
 .bg-beacon {
-  background-image: var(--boston-beacon);
+  background-image: url('/boston_beacon.png');
 }
 
 /* --- Accessibility & Polish --- */
