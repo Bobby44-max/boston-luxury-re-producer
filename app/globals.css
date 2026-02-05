@@ -42,7 +42,7 @@ html {
 
 body {
   font-family: "Inter", "Plus Jakarta Sans", system-ui, sans-serif;
-  background-color: var(--luxury-black);
+  background-color: transparent;
   color: #FAFAFA;
   overflow-x: hidden;
   min-height: 100vh;
