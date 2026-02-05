@@ -285,8 +285,11 @@ h3,
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, rgba(15, 15, 17, 0.4) 0%, var(--luxury-black) 90%);
-  backdrop-filter: blur(2px);
+  background: linear-gradient(to bottom,
+    rgba(15, 15, 17, 0.3) 0%,
+    rgba(15, 15, 17, 0.5) 50%,
+    rgba(15, 15, 17, 0.75) 100%);
+  backdrop-filter: blur(1px);
 }
 
 .bg-seaport {
