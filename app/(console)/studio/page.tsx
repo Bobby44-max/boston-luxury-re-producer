@@ -1,292 +1,441 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import {
-  User,
-  Video,
+  Globe,
   Loader2,
   Sparkles,
   Play,
   Download,
+  CheckCircle2,
+  AlertCircle,
+  Film,
+  Clock,
   Volume2,
+  Wand2,
+  RefreshCw,
 } from "lucide-react";
 
-// HeyGen Avatar options
-const AVATARS = [
-  { id: "josh_lite3_20230714", name: "Josh", style: "Professional Male" },
-  { id: "anna_costume1_20220908", name: "Anna", style: "Professional Female" },
-  { id: "tyler-incasualsuit-20220721", name: "Tyler", style: "Casual Male" },
-  { id: "sophia_costume1_20220804", name: "Sophia", style: "Casual Female" },
+const VIDEO_TYPES = [
+  { id: "property-showcase", name: "Property Showcase", duration: "30s", aspect: "16:9" },
+  { id: "social-short", name: "Social Short", duration: "9s", aspect: "9:16" },
+  { id: "just-listed", name: "Just Listed", duration: "12s", aspect: "9:16" },
 ];
 
 const VOICES = [
-  { id: "en-US-AriaNeural", name: "Aria", accent: "US Female" },
-  { id: "en-US-GuyNeural", name: "Guy", accent: "US Male" },
-  { id: "en-US-JennyNeural", name: "Jenny", accent: "US Female" },
-  { id: "en-GB-RyanNeural", name: "Ryan", accent: "British Male" },
+  { id: "alloy", name: "Alloy", desc: "Neutral & professional" },
+  { id: "echo", name: "Echo", desc: "Warm & inviting" },
+  { id: "nova", name: "Nova", desc: "Energetic & dynamic" },
+  { id: "onyx", name: "Onyx", desc: "Deep & authoritative" },
 ];
 
+type JobStatus =
+  | "idle"
+  | "pending"
+  | "scraping"
+  | "scraped"
+  | "generating"
+  | "script_ready"
+  | "voiceover"
+  | "voiceover_ready"
+  | "rendering"
+  | "complete"
+  | "error";
+
+const STATUS_LABELS: Record<JobStatus, string> = {
+  idle: "Ready",
+  pending: "Starting...",
+  scraping: "Extracting property data...",
+  scraped: "Property data extracted",
+  generating: "Writing script...",
+  script_ready: "Script complete",
+  voiceover: "Generating voiceover...",
+  voiceover_ready: "Voiceover ready",
+  rendering: "Rendering video...",
+  complete: "Complete!",
+  error: "Error occurred",
+};
+
+const STATUS_PROGRESS: Record<JobStatus, number> = {
+  idle: 0,
+  pending: 5,
+  scraping: 15,
+  scraped: 25,
+  generating: 40,
+  script_ready: 50,
+  voiceover: 60,
+  voiceover_ready: 70,
+  rendering: 85,
+  complete: 100,
+  error: 0,
+};
+
 export default function StudioPage() {
-  const [script, setScript] = useState("");
-  const [selectedAvatar, setSelectedAvatar] = useState(AVATARS[0].id);
-  const [selectedVoice, setSelectedVoice] = useState(VOICES[0].id);
-  const [isGenerating, setIsGenerating] = useState(false);
+  const searchParams = useSearchParams();
+
+  const [url, setUrl] = useState(searchParams.get("url") || "");
+  const [videoType, setVideoType] = useState(searchParams.get("type") || "property-showcase");
+  const [voice, setVoice] = useState("alloy");
+  const [voiceoverEnabled, setVoiceoverEnabled] = useState(true);
+
+  const [status, setStatus] = useState<JobStatus>("idle");
+  const [progress, setProgress] = useState(0);
+  const [jobId, setJobId] = useState<string | null>(null);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [propertyData, setPropertyData] = useState<any>(null);
+
+  // Poll for job status
+  useEffect(() => {
+    if (!jobId || status === "complete" || status === "error") return;
+
+    const pollInterval = setInterval(async () => {
+      try {
+        const response = await fetch(`/api/video/status?id=${jobId}`);
+        const data = await response.json();
+
+        if (data.status) {
+          setStatus(data.status as JobStatus);
+          setProgress(data.progress || STATUS_PROGRESS[data.status as JobStatus]);
+        }
+
+        if (data.propertyData) {
+          setPropertyData(data.propertyData);
+        }
+
+        if (data.status === "complete" && data.videoUrl) {
+          setVideoUrl(data.videoUrl);
+          clearInterval(pollInterval);
+        }
+
+        if (data.status === "error" || data.error) {
+          setError(data.error || "An error occurred");
+          setStatus("error");
+          clearInterval(pollInterval);
+        }
+      } catch (err) {
+        console.error("Status poll error:", err);
+      }
+    }, 2000);
+
+    return () => clearInterval(pollInterval);
+  }, [jobId, status]);
 
   const handleGenerate = async () => {
-    if (!script.trim()) return;
+    if (!url.trim()) return;
 
-    setIsGenerating(true);
+    setStatus("pending");
+    setProgress(5);
     setError(null);
     setVideoUrl(null);
+    setPropertyData(null);
 
     try {
-      const response = await fetch("/api/avatar/generate", {
+      const response = await fetch("/api/video/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          script,
-          avatarId: selectedAvatar,
-          voiceId: selectedVoice,
+          listingUrl: url,
+          videoType,
+          voiceoverEnabled,
+          voice,
         }),
       });
 
       const data = await response.json();
 
       if (!data.success) {
-        throw new Error(data.error || "Failed to generate video");
+        throw new Error(data.error || "Failed to start generation");
       }
 
-      if (data.videoId) {
-        pollForVideo(data.videoId);
-      }
+      setJobId(data.jobId);
+      setStatus("scraping");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Generation failed");
-      setIsGenerating(false);
+      setStatus("error");
     }
   };
 
-  const pollForVideo = async (videoId: string) => {
-    const maxAttempts = 60;
-    let attempts = 0;
-
-    const poll = async () => {
-      attempts++;
-      try {
-        const response = await fetch(`/api/avatar/status?videoId=${videoId}`);
-        const data = await response.json();
-
-        if (data.status === "completed" && data.videoUrl) {
-          setVideoUrl(data.videoUrl);
-          setIsGenerating(false);
-        } else if (data.status === "failed") {
-          setError("Video generation failed");
-          setIsGenerating(false);
-        } else if (attempts < maxAttempts) {
-          setTimeout(poll, 5000);
-        } else {
-          setError("Video generation timed out");
-          setIsGenerating(false);
-        }
-      } catch {
-        setError("Failed to check video status");
-        setIsGenerating(false);
-      }
-    };
-
-    poll();
+  const handleReset = () => {
+    setStatus("idle");
+    setProgress(0);
+    setJobId(null);
+    setVideoUrl(null);
+    setError(null);
+    setPropertyData(null);
   };
 
+  const isGenerating = status !== "idle" && status !== "complete" && status !== "error";
+
   return (
-    <div className="space-y-12">
-      <header>
-        <h1 className="text-4xl md:text-5xl font-bold font-syne tracking-tighter uppercase">Intelligence <span className="text-white/20">Studio.</span></h1>
-        <p className="text-white/40 mt-2 font-medium tracking-wide">Generate high-fidelity luxury assets with Aura × Gemini.</p>
+    <div className="min-h-screen pb-20">
+      {/* Header */}
+      <header className="mb-10">
+        <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">
+          Video Studio
+        </h1>
+        <p className="text-white/40">
+          Generate cinematic property videos from any listing URL
+        </p>
       </header>
 
-      <div className="grid lg:grid-cols-2 gap-12">
-        {/* Input Panel */}
-        <div className="premium-glass p-10 reveal">
-          <div className="flex items-center gap-5 mb-10">
-            <div className="w-14 h-14 rounded-2xl bg-accent-indigo flex items-center justify-center shadow-lg shadow-accent-indigo/20">
-              <Video className="w-7 h-7 text-white" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold font-syne tracking-tight uppercase">AI Digital <span className="text-accent-indigo">Twin</span></h2>
-              <p className="text-xs font-bold tracking-widest text-white/30 uppercase mt-1">Powered by HeyGen Engine</p>
+      <div className="grid lg:grid-cols-5 gap-8">
+        {/* Left Panel - Input */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* URL Input */}
+          <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.06]">
+            <label className="block text-xs font-semibold text-white/40 uppercase tracking-wider mb-3">
+              Listing URL
+            </label>
+            <div className="relative">
+              <Globe className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20" />
+              <input
+                type="url"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder="https://zillow.com/..."
+                disabled={isGenerating}
+                className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl py-4 pl-12 pr-4 text-[15px] placeholder:text-white/20 focus:outline-none focus:border-white/20 disabled:opacity-50"
+              />
             </div>
           </div>
 
-          {/* Script Input */}
-          <div className="mb-8">
-            <label className="block text-[10px] uppercase font-bold tracking-[0.2em] text-white/30 mb-3">
-              Asset Narrative
+          {/* Video Type */}
+          <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.06]">
+            <label className="block text-xs font-semibold text-white/40 uppercase tracking-wider mb-3">
+              Video Type
             </label>
-            <textarea
-              value={script}
-              onChange={(e) => setScript(e.target.value)}
-              placeholder="Define the narrative... (e.g., 'Discover an unparalleled architectural masterpiece...')"
-              className="glass-input w-full h-48 resize-none bg-white/[0.02] border-white/10 rounded-2xl focus:border-accent-indigo transition-all font-medium py-6 px-8"
-              maxLength={1000}
-            />
-            <div className="flex justify-between items-center mt-3">
-              <p className="text-[10px] font-bold tracking-widest text-white/20">
-                {script.length} / 1000
-              </p>
-              <div className="h-[2px] w-24 bg-white/5 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-accent-indigo transition-all duration-300"
-                  style={{ width: `${(script.length / 1000) * 100}%` }}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Avatar Selection */}
-          <div className="mb-8">
-            <label className="block text-[10px] uppercase font-bold tracking-[0.2em] text-white/30 mb-4">
-              Persona Selection
-            </label>
-            <div className="grid grid-cols-2 gap-4">
-              {AVATARS.map((avatar) => (
+            <div className="space-y-2">
+              {VIDEO_TYPES.map((type) => (
                 <button
-                  key={avatar.id}
-                  onClick={() => setSelectedAvatar(avatar.id)}
-                  className={`p-6 rounded-2xl border transition-all text-left group relative overflow-hidden ${selectedAvatar === avatar.id
-                    ? "bg-accent-indigo/10 border-accent-indigo"
-                    : "bg-white/[0.02] border-white/5 hover:border-white/20"
-                    }`}
+                  key={type.id}
+                  onClick={() => setVideoType(type.id)}
+                  disabled={isGenerating}
+                  className={`w-full p-4 rounded-xl border text-left transition-all flex items-center justify-between ${
+                    videoType === type.id
+                      ? "bg-white/[0.05] border-white/20"
+                      : "border-white/[0.06] hover:border-white/[0.12]"
+                  } disabled:opacity-50`}
                 >
-                  <User className={`w-8 h-8 mb-4 transition-colors ${selectedAvatar === avatar.id ? "text-accent-indigo" : "text-white/20"}`} />
-                  <p className="font-bold text-sm tracking-tight">{avatar.name}</p>
-                  <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest mt-1">{avatar.style}</p>
-                  {selectedAvatar === avatar.id && (
-                    <div className="absolute top-0 right-0 p-3">
-                      <Sparkles className="w-3 h-3 text-accent-indigo" />
-                    </div>
-                  )}
+                  <div className="flex items-center gap-3">
+                    <Film className={`w-4 h-4 ${videoType === type.id ? "text-white" : "text-white/30"}`} />
+                    <span className="font-medium">{type.name}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-white/30">
+                    <span>{type.duration}</span>
+                    <span className="text-white/10">·</span>
+                    <span className="font-mono">{type.aspect}</span>
+                  </div>
                 </button>
               ))}
             </div>
           </div>
 
           {/* Voice Selection */}
-          <div className="mb-10">
-            <label className="block text-[10px] uppercase font-bold tracking-[0.2em] text-white/30 mb-4">
-              Tonal Character
-            </label>
-            <div className="grid grid-cols-2 gap-4">
-              {VOICES.map((voice) => (
-                <button
-                  key={voice.id}
-                  onClick={() => setSelectedVoice(voice.id)}
-                  className={`p-5 rounded-2xl border transition-all text-left flex items-center gap-4 ${selectedVoice === voice.id
-                    ? "bg-accent-indigo/10 border-accent-indigo"
-                    : "bg-white/[0.02] border-white/5 hover:border-white/20"
-                    }`}
-                >
-                  <div className={`p-2 rounded-lg transition-colors ${selectedVoice === voice.id ? "bg-accent-indigo text-white" : "bg-white/5 text-white/20"}`}>
-                    <Volume2 className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <p className="font-bold text-sm tracking-tight">{voice.name}</p>
-                    <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest">{voice.accent}</p>
-                  </div>
-                </button>
-              ))}
+          <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.06]">
+            <div className="flex items-center justify-between mb-3">
+              <label className="text-xs font-semibold text-white/40 uppercase tracking-wider">
+                AI Voiceover
+              </label>
+              <button
+                onClick={() => setVoiceoverEnabled(!voiceoverEnabled)}
+                disabled={isGenerating}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                  voiceoverEnabled
+                    ? "bg-emerald-500/20 text-emerald-400"
+                    : "bg-white/[0.05] text-white/30"
+                } disabled:opacity-50`}
+              >
+                {voiceoverEnabled ? "Enabled" : "Disabled"}
+              </button>
             </div>
+
+            {voiceoverEnabled && (
+              <div className="grid grid-cols-2 gap-2">
+                {VOICES.map((v) => (
+                  <button
+                    key={v.id}
+                    onClick={() => setVoice(v.id)}
+                    disabled={isGenerating}
+                    className={`p-3 rounded-xl border text-left transition-all ${
+                      voice === v.id
+                        ? "bg-white/[0.05] border-white/20"
+                        : "border-white/[0.06] hover:border-white/[0.12]"
+                    } disabled:opacity-50`}
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <Volume2 className={`w-3 h-3 ${voice === v.id ? "text-white" : "text-white/30"}`} />
+                      <span className="font-medium text-sm">{v.name}</span>
+                    </div>
+                    <span className="text-[11px] text-white/30">{v.desc}</span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Generate Button */}
           <button
-            onClick={handleGenerate}
-            disabled={isGenerating || !script.trim()}
-            className="btn-premium-solid w-full"
+            onClick={isGenerating ? undefined : (status === "complete" || status === "error" ? handleReset : handleGenerate)}
+            disabled={!url.trim() && status === "idle"}
+            className={`w-full py-4 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 ${
+              isGenerating
+                ? "bg-white/[0.05] text-white/50 cursor-wait"
+                : status === "complete"
+                ? "bg-emerald-500 text-white hover:bg-emerald-600"
+                : status === "error"
+                ? "bg-white text-black hover:bg-white/90"
+                : "bg-white text-black hover:bg-white/90 disabled:bg-white/10 disabled:text-white/30 disabled:cursor-not-allowed"
+            }`}
           >
-            <div className="relative flex items-center justify-center gap-3">
-              {isGenerating ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Synthesizing...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-5 h-5" />
-                  Commence Generation
-                </>
-              )}
-            </div>
+            {isGenerating ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Generating...
+              </>
+            ) : status === "complete" ? (
+              <>
+                <RefreshCw className="w-5 h-5" />
+                Generate Another
+              </>
+            ) : status === "error" ? (
+              <>
+                <RefreshCw className="w-5 h-5" />
+                Try Again
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-5 h-5" />
+                Generate Video
+              </>
+            )}
           </button>
-
-          {error && (
-            <div className="mt-6 p-5 bg-red-500/10 border border-red-500/20 rounded-2xl">
-              <p className="text-red-400 text-xs font-bold uppercase tracking-widest">{error}</p>
-            </div>
-          )}
         </div>
 
-        {/* Preview Panel */}
-        <div className="flex flex-col h-full">
-          <div className="mb-6 flex justify-between items-center">
-            <h3 className="text-xs uppercase font-bold tracking-[0.2em] text-white/30">Asset Preview</h3>
-            <div className="flex gap-2">
-              <div className="w-2 h-2 rounded-full bg-accent-indigo" />
-              <div className="w-2 h-2 rounded-full bg-white/10" />
-              <div className="w-2 h-2 rounded-full bg-white/10" />
-            </div>
-          </div>
-
-          <div className="flex-1 rounded-[32px] bg-black border border-white/5 flex items-center justify-center min-h-[500px] overflow-hidden relative group shadow-2xl">
-            {isGenerating ? (
-              <div className="text-center relative z-10">
-                <div className="relative mb-6">
-                  <div className="absolute inset-0 bg-accent-indigo/20 blur-3xl animate-pulse" />
-                  <Loader2 className="w-16 h-16 text-accent-indigo animate-spin mx-auto relative z-10" />
-                </div>
-                <p className="text-lg font-syne font-bold uppercase tracking-widest">Synthesizing Luxury</p>
-                <p className="text-[10px] text-white/20 font-bold uppercase tracking-[0.3em] mt-3">Est. Time: 60-180s</p>
-              </div>
-            ) : videoUrl ? (
+        {/* Right Panel - Preview & Progress */}
+        <div className="lg:col-span-3 space-y-6">
+          {/* Video Preview */}
+          <div className="aspect-video rounded-2xl bg-black border border-white/[0.06] overflow-hidden relative">
+            {videoUrl ? (
               <video
                 src={videoUrl}
                 controls
                 autoPlay
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
               />
             ) : (
-              <div className="text-center group-hover:scale-105 transition-transform duration-700">
-                <div className="w-24 h-24 rounded-full border border-white/5 flex items-center justify-center mx-auto mb-6 bg-white/[0.02]">
-                  <Play className="w-8 h-8 text-white/10 group-hover:text-accent-indigo transition-colors" />
-                </div>
-                <p className="text-sm font-bold uppercase tracking-[0.2em] text-white/20">Await selection</p>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                {isGenerating ? (
+                  <div className="text-center">
+                    <div className="w-16 h-16 rounded-full bg-white/[0.03] flex items-center justify-center mx-auto mb-4">
+                      <Loader2 className="w-8 h-8 text-white/30 animate-spin" />
+                    </div>
+                    <p className="text-white/40 font-medium">{STATUS_LABELS[status]}</p>
+                  </div>
+                ) : status === "error" ? (
+                  <div className="text-center">
+                    <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
+                      <AlertCircle className="w-8 h-8 text-red-400" />
+                    </div>
+                    <p className="text-red-400 font-medium mb-2">Generation Failed</p>
+                    <p className="text-white/30 text-sm max-w-xs">{error}</p>
+                  </div>
+                ) : (
+                  <div className="text-center">
+                    <div className="w-16 h-16 rounded-full bg-white/[0.03] flex items-center justify-center mx-auto mb-4">
+                      <Play className="w-8 h-8 text-white/20" />
+                    </div>
+                    <p className="text-white/30">Your video will appear here</p>
+                  </div>
+                )}
               </div>
             )}
-
-            {/* Glass overlay hint */}
-            <div className="absolute inset-0 border-[24px] border-black/20 pointer-events-none" />
           </div>
 
+          {/* Progress Bar */}
+          {(isGenerating || status === "complete") && (
+            <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.06]">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-medium">{STATUS_LABELS[status]}</span>
+                <span className="text-sm text-white/40">{progress}%</span>
+              </div>
+              <div className="h-2 bg-white/[0.05] rounded-full overflow-hidden">
+                <div
+                  className={`h-full transition-all duration-500 ${
+                    status === "complete" ? "bg-emerald-500" : "bg-white/40"
+                  }`}
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+
+              {/* Step Indicators */}
+              <div className="grid grid-cols-4 gap-2 mt-4">
+                {[
+                  { key: "scraping", label: "Extract", icon: Globe },
+                  { key: "generating", label: "Script", icon: Wand2 },
+                  { key: "voiceover", label: "Voice", icon: Volume2 },
+                  { key: "rendering", label: "Render", icon: Film },
+                ].map((step) => {
+                  const stepProgress = STATUS_PROGRESS[step.key as JobStatus];
+                  const isComplete = progress >= stepProgress + 15;
+                  const isActive = progress >= stepProgress && progress < stepProgress + 15;
+                  const Icon = step.icon;
+
+                  return (
+                    <div
+                      key={step.key}
+                      className={`p-3 rounded-xl text-center transition-all ${
+                        isComplete
+                          ? "bg-emerald-500/10 text-emerald-400"
+                          : isActive
+                          ? "bg-white/[0.05] text-white"
+                          : "text-white/20"
+                      }`}
+                    >
+                      <Icon className="w-4 h-4 mx-auto mb-1" />
+                      <span className="text-[10px] font-medium">{step.label}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Download Button */}
           {videoUrl && (
             <a
               href={videoUrl}
-              download="luxury-asset.mp4"
-              className="btn-premium-solid mt-8 text-xs h-14"
+              download
+              className="flex items-center justify-center gap-2 w-full py-4 rounded-xl bg-white/[0.05] border border-white/[0.1] font-medium hover:bg-white/[0.08] transition-all"
             >
-              <Download className="w-4 h-4" />
-              Archive Intelligence
+              <Download className="w-5 h-5" />
+              Download Video
             </a>
           )}
 
-          <div className="mt-8 p-6 premium-glass border-accent-indigo/10">
-            <div className="flex items-start gap-4">
-              <Sparkles className="w-5 h-5 text-accent-indigo mt-1" />
-              <div>
-                <h4 className="text-xs font-bold uppercase tracking-widest text-accent-indigo">Aura Pro-Tip</h4>
-                <p className="text-sm text-white/40 mt-1">High-fidelity renders are optimized for theatre viewing. Ensure your narrative aligns with the luxury archetype for maximum conversion.</p>
+          {/* Property Data Preview */}
+          {propertyData && (
+            <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.06]">
+              <h3 className="text-xs font-semibold text-white/40 uppercase tracking-wider mb-3">
+                Extracted Data
+              </h3>
+              <div className="space-y-2 text-sm">
+                {propertyData.address && (
+                  <p><span className="text-white/40">Address:</span> {propertyData.address}</p>
+                )}
+                {propertyData.price && (
+                  <p><span className="text-white/40">Price:</span> ${propertyData.price.toLocaleString()}</p>
+                )}
+                {propertyData.bedrooms && (
+                  <p><span className="text-white/40">Beds/Baths:</span> {propertyData.bedrooms} bd / {propertyData.bathrooms} ba</p>
+                )}
+                {propertyData.sqft && (
+                  <p><span className="text-white/40">Sqft:</span> {propertyData.sqft.toLocaleString()}</p>
+                )}
               </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

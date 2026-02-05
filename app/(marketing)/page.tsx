@@ -1,65 +1,76 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
-  Video,
   ArrowRight,
-  Check,
+  Play,
   Sparkles,
-  Volume2,
-  Layers,
-  Zap,
-  Shield,
-  BarChart3,
-  Cpu,
   Globe,
+  Wand2,
+  Film,
+  Clock,
+  CheckCircle2,
+  Loader2,
+  Volume2,
+  Zap,
 } from "lucide-react";
 
-// Metrics data
-const METRICS = [
-  { value: "4.2s", label: "Render Velocity" },
-  { value: "340%", label: "Engagement Lift" },
-  { value: "12K+", label: "Assets Synthesized" },
-];
-
-// Features for Bento Grid
-const BENTO_FEATURES = [
+const VIDEO_TYPES = [
   {
-    title: "Agentic Scraping",
-    desc: "Autonomous Firecrawl extraction from Zillow, Redfin, and private MLS nodes.",
-    icon: <Globe className="w-8 h-8 text-cyan-400" />,
-    className: "col-span-2 row-span-1 bento-item bg-white/[0.02] border border-white/5",
+    id: "property-showcase",
+    name: "Property Showcase",
+    duration: "30s",
+    aspect: "16:9",
+    desc: "Cinematic property tour with AI voiceover",
   },
   {
-    title: "Lifestyle Copy",
-    desc: "Gemini-powered narratives that capture the 'aura' of elite properties.",
-    icon: <Sparkles className="w-8 h-8 text-amber-400" />,
-    className: "col-span-2 row-span-1 bento-item bg-white/[0.02] border border-white/5",
+    id: "social-short",
+    name: "Social Short",
+    duration: "9s",
+    aspect: "9:16",
+    desc: "TikTok & Reels optimized vertical",
   },
   {
-    title: "Glassmorphic Motion",
-    desc: "Remotion-driven 60fps cinematic overlays.",
-    icon: <Layers className="w-8 h-8 text-indigo-400" />,
-    className: "col-span-1 row-span-1 bento-item bg-white/[0.02] border border-white/5",
-  },
-  {
-    title: "Global Reach",
-    desc: "Instant multi-format deployment for any channel.",
-    icon: <Cpu className="w-8 h-8 text-rose-400" />,
-    className: "col-span-2 row-span-1 bento-item bg-white/[0.02] border border-white/5",
-  },
-  {
-    title: "Brand Sovereignty",
-    desc: "Your identity, automated.",
-    icon: <Shield className="w-8 h-8 text-emerald-400" />,
-    className: "col-span-1 row-span-1 bento-item bg-white/[0.02] border border-white/5",
+    id: "just-listed",
+    name: "Just Listed",
+    duration: "12s",
+    aspect: "9:16",
+    desc: "New listing announcement",
   },
 ];
 
-export default function MarketingHomePage() {
-  const containerRef = useRef<HTMLDivElement>(null);
+const WORKFLOW_STEPS = [
+  {
+    icon: <Globe className="w-5 h-5" />,
+    title: "Paste URL",
+    desc: "Any Zillow, Redfin, or MLS link",
+  },
+  {
+    icon: <Wand2 className="w-5 h-5" />,
+    title: "AI Extracts",
+    desc: "Photos, specs & description",
+  },
+  {
+    icon: <Sparkles className="w-5 h-5" />,
+    title: "Script Written",
+    desc: "Gemini crafts the narrative",
+  },
+  {
+    icon: <Film className="w-5 h-5" />,
+    title: "Video Rendered",
+    desc: "Cinema-grade Remotion output",
+  },
+];
 
+export default function MarketingPage() {
+  const router = useRouter();
+  const [url, setUrl] = useState("");
+  const [selectedType, setSelectedType] = useState("property-showcase");
+  const [isHovering, setIsHovering] = useState(false);
+
+  // Reveal animation
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -75,172 +86,230 @@ export default function MarketingHomePage() {
     const revealElements = document.querySelectorAll(".reveal");
     revealElements.forEach((el) => observer.observe(el));
 
-    // Light-tracking effect
-    const handleMouseMove = (e: MouseEvent) => {
-      const cards = document.querySelectorAll(".premium-glass");
-      cards.forEach((card) => {
-        const rect = (card as HTMLElement).getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        (card as HTMLElement).style.setProperty("--mouse-x", `${x}px`);
-        (card as HTMLElement).style.setProperty("--mouse-y", `${y}px`);
-      });
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      observer.disconnect();
-    };
+    return () => observer.disconnect();
   }, []);
 
+  const handleGenerate = () => {
+    if (!url.trim()) return;
+    router.push(`/studio?url=${encodeURIComponent(url)}&type=${selectedType}`);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && url.trim()) {
+      handleGenerate();
+    }
+  };
+
   return (
-    <div className="relative min-h-screen bg-transparent text-white selection:bg-white/10">
+    <div className="min-h-screen bg-transparent">
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 px-8 flex flex-col items-center justify-center text-center overflow-hidden">
-        <div className="max-w-6xl mx-auto items-center justify-center flex flex-col relative z-10 reveal">
-          <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold uppercase tracking-[0.3em] reveal mb-10 text-white/60">
-            <Sparkles className="w-4 h-4 text-amber-500" />
-            Intelligence Layer v4.0
+      <section className="relative pt-36 pb-20 px-6">
+        <div className="max-w-3xl mx-auto text-center reveal">
+          {/* Status Badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.03] border border-white/[0.06] mb-10">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-[11px] font-medium text-white/50 tracking-wide">
+              Remotion Video Engine · Live
+            </span>
           </div>
 
-          <h1 className="text-8xl md:text-[11rem] leading-[0.85] tracking-tighter reveal mb-12">
-            Instant <br />
-            <span className="gradient-gold-premium">Masterpiece</span>
+          {/* Headline */}
+          <h1 className="text-[3.5rem] md:text-[4.5rem] leading-[1.05] font-bold tracking-tight mb-6">
+            Listing URL to
+            <br />
+            <span className="gradient-gold-premium">Video in Minutes</span>
           </h1>
 
-          <p className="max-w-2xl mx-auto text-xl md:text-2xl text-white/40 leading-relaxed reveal mb-16 font-medium">
-            Turn any listing URL into a cinematic production. Our agentic studio handles the script, voice, and rendering in seconds.
+          {/* Subhead */}
+          <p className="text-lg text-white/40 max-w-lg mx-auto mb-12 leading-relaxed">
+            Paste any real estate listing. Get a professionally narrated,
+            beautifully rendered marketing video.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 reveal">
-            <Link href="/studio" className="btn-premium btn-premium-solid">
-              Acquire Access <ArrowRight className="w-4 h-4" />
-            </Link>
-            <Link href="/" className="btn-premium btn-premium-outline">
-              Review Architecture
-            </Link>
+          {/* URL Input */}
+          <div className="max-w-xl mx-auto mb-8">
+            <div
+              className={`relative rounded-2xl transition-all duration-300 ${
+                isHovering ? "bg-white/[0.04]" : "bg-white/[0.02]"
+              } border border-white/[0.06] hover:border-white/[0.12]`}
+              onMouseEnter={() => setIsHovering(true)}
+              onMouseLeave={() => setIsHovering(false)}
+            >
+              <div className="flex items-center">
+                <div className="pl-5">
+                  <Globe className="w-5 h-5 text-white/20" />
+                </div>
+                <input
+                  type="url"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Paste Zillow, Redfin, or any listing URL..."
+                  className="flex-1 bg-transparent py-5 px-4 text-[15px] text-white placeholder:text-white/25 focus:outline-none"
+                />
+                <button
+                  onClick={handleGenerate}
+                  disabled={!url.trim()}
+                  className={`m-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all flex items-center gap-2 ${
+                    url.trim()
+                      ? "bg-white text-black hover:bg-white/90"
+                      : "bg-white/10 text-white/30 cursor-not-allowed"
+                  }`}
+                >
+                  Generate
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Video Type Pills */}
+          <div className="flex flex-wrap justify-center gap-2 mb-12">
+            {VIDEO_TYPES.map((type) => (
+              <button
+                key={type.id}
+                onClick={() => setSelectedType(type.id)}
+                className={`px-4 py-2 rounded-full text-[13px] font-medium transition-all ${
+                  selectedType === type.id
+                    ? "bg-white/10 text-white border border-white/20"
+                    : "text-white/40 hover:text-white/60 border border-transparent"
+                }`}
+              >
+                {type.name}
+                <span className="ml-1.5 text-white/30">{type.duration}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Trust Row */}
+          <div className="flex items-center justify-center gap-8 text-[13px] text-white/30">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500/70" />
+              <span>No watermarks</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4" />
+              <span>~2 min render</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Zap className="w-4 h-4" />
+              <span>4K quality</span>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Metrics Section */}
-      <section className="py-24 px-8 relative overflow-hidden backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-1 px-1 bg-white/5 rounded-[48px] overflow-hidden premium-glass border-white/5 shadow-2xl">
-            {METRICS.map((metric, i) => (
-              <div key={i} className="bg-black/40 backdrop-blur-xl p-16 text-center group transition-all hover:bg-white/[0.02]">
-                <div className="text-6xl md:text-7xl font-bold font-syne tracking-tighter mb-4 transition-transform group-hover:scale-105">{metric.value}</div>
-                <div className="text-[10px] font-bold uppercase tracking-[0.4em] text-white/20">{metric.label}</div>
+      {/* Workflow Steps */}
+      <section className="py-20 px-6 reveal">
+        <div className="max-w-3xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {WORKFLOW_STEPS.map((step, i) => (
+              <div
+                key={i}
+                className="relative p-5 rounded-2xl bg-white/[0.02] border border-white/[0.05] group hover:border-white/[0.1] transition-all"
+              >
+                <div className="w-10 h-10 rounded-xl bg-white/[0.05] flex items-center justify-center mb-4 text-white/40 group-hover:text-white/60 transition-colors">
+                  {step.icon}
+                </div>
+                <div className="text-[10px] font-bold text-white/20 tracking-widest mb-1.5">
+                  STEP {i + 1}
+                </div>
+                <div className="font-semibold text-sm mb-1">{step.title}</div>
+                <div className="text-xs text-white/30">{step.desc}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Feature Bento Grid */}
-      <section className="py-32 px-8 relative backdrop-blur-[2px]">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-24 gap-8 reveal">
-            <div>
-              <h2 className="text-6xl md:text-8xl tracking-tighter leading-none mb-6">
-                Engineered <br />
-                <span className="text-white/20">Excellence.</span>
-              </h2>
-              <p className="text-xl text-white/40 max-w-xl font-medium">
-                The fusion of agentic intelligence and programmatic rendering.
-              </p>
-            </div>
-          </div>
-
-          <div className="bento-grid grid-cols-1 md:grid-cols-4 reveal">
-            {BENTO_FEATURES.map((feature, i) => (
-              <div key={i} className={`${feature.className} premium-glass group hover:border-white/20 transition-all duration-500`}>
-                <div className="mb-8 p-4 rounded-2xl bg-white/5 w-fit group-hover:bg-white/10 transition-colors">
-                  {feature.icon}
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold font-syne uppercase tracking-tight mb-4">{feature.title}</h3>
-                  <p className="text-lg text-white/30 font-medium leading-relaxed group-hover:text-white/60 transition-colors">{feature.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Process Section */}
-      <section className="py-32 px-8 relative overflow-hidden backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-24 items-center">
-            <div className="reveal">
-              <h2 className="text-5xl md:text-7xl tracking-tighter leading-tight mb-8">
-                The New <br /> Standard.
-              </h2>
-              <ul className="space-y-8">
-                {[
-                  { title: "Universal Intake", desc: "Paste any URL from Zillow or Redfin." },
-                  { title: "Synthetic Narrative", desc: "AI builds a localized script automatically." },
-                  { title: "Cloud Synthesis", desc: "High-spec Remotion instances render in 4K." },
-                ].map((item, i) => (
-                  <li key={i} className="flex gap-6 items-start group">
-                    <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 text-amber-500 font-bold group-hover:bg-white/10 transition-all">
-                      {i + 1}
-                    </div>
-                    <div>
-                      <h4 className="text-xl font-bold uppercase tracking-tight mb-2">{item.title}</h4>
-                      <p className="text-white/40 font-medium leading-relaxed">{item.desc}</p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="relative reveal">
-              <div className="aspect-square rounded-[64px] bg-gradient-to-br from-indigo-500/20 via-transparent to-rose-500/20 premium-glass border-white/5 flex items-center justify-center animate-pulse">
-                <Volume2 className="w-32 h-32 text-white/10" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
-              </div>
-              <div className="absolute -bottom-12 -right-12 p-10 premium-glass rounded-[40px] border-white/10 bg-black/60 backdrop-blur-3xl shadow-2xl max-w-xs animate-bounce duration-[6000ms]">
-                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-amber-500 mb-4">AI Concierge</p>
-                <p className="text-lg font-medium text-white/80 leading-relaxed italic animate-pulse">
-                  "Your listing for 42 Beacon St has been successfully synthesized."
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing / Access Section */}
-      <section id="pricing" className="py-60 px-8 bg-neutral-950/20 relative">
-        <div className="max-w-7xl mx-auto text-center reveal">
-          <h2 className="text-6xl md:text-[9rem] tracking-tighter leading-none mb-12">
-            Ready to <br />
-            <span className="text-white/20">Synthesize?</span>
-          </h2>
-          <div className="max-w-3xl mx-auto p-16 premium-glass rounded-[64px] border-white/10 bg-white/[0.01] shadow-2xl">
-            <h3 className="text-4xl font-bold font-syne uppercase tracking-tight mb-8">Professional License</h3>
-            <p className="text-xl text-white/40 mb-12 leading-relaxed">
-              Unlock unlimited 4K renders, agentic scraping, and institutional-grade branding across all platforms.
+      {/* Video Types Section */}
+      <section className="py-20 px-6 border-t border-white/[0.04] reveal">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold tracking-tight mb-3">
+              Choose Your Format
+            </h2>
+            <p className="text-white/40">
+              Optimized for every platform
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-              <Link href="/studio" className="btn-premium btn-premium-solid w-full sm:w-auto">
-                Begin Activation
-              </Link>
-              <Link href="/studio" className="btn-premium btn-premium-outline w-full sm:w-auto">
-                Schedule Demo
-              </Link>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-4">
+            {VIDEO_TYPES.map((type) => (
+              <div
+                key={type.id}
+                className="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:border-white/[0.1] transition-all group"
+              >
+                <div className="flex items-center justify-between mb-5">
+                  <div
+                    className={`w-11 h-11 rounded-xl flex items-center justify-center ${
+                      type.aspect === "16:9"
+                        ? "bg-indigo-500/10 text-indigo-400"
+                        : "bg-amber-500/10 text-amber-400"
+                    }`}
+                  >
+                    <Film className="w-5 h-5" />
+                  </div>
+                  <span className="text-[11px] font-mono text-white/20">
+                    {type.aspect}
+                  </span>
+                </div>
+                <h3 className="font-bold mb-1.5">{type.name}</h3>
+                <p className="text-sm text-white/30 mb-4">{type.desc}</p>
+                <div className="flex items-center gap-2 text-xs text-white/40">
+                  <Clock className="w-3.5 h-3.5" />
+                  {type.duration}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Tech Stack */}
+      <section className="py-20 px-6 border-t border-white/[0.04] reveal">
+        <div className="max-w-3xl mx-auto text-center">
+          <div className="inline-flex items-center gap-6 px-8 py-4 rounded-2xl bg-white/[0.02] border border-white/[0.05]">
+            <span className="text-xs font-medium text-white/30">Powered by</span>
+            <div className="flex items-center gap-4 text-sm font-medium text-white/50">
+              <span>Firecrawl</span>
+              <span className="text-white/10">·</span>
+              <span>Gemini</span>
+              <span className="text-white/10">·</span>
+              <span>OpenAI TTS</span>
+              <span className="text-white/10">·</span>
+              <span>Remotion</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Global Footer Decoration */}
-      <div className="py-20 text-center border-t border-white/5 reveal">
-        <p className="text-[10px] font-bold uppercase tracking-[0.6em] text-white/10">
-          Apex Luxury Intelligence Suite &copy; 2026
-        </p>
-      </div>
+      {/* CTA */}
+      <section className="py-24 px-6 border-t border-white/[0.04] reveal">
+        <div className="max-w-xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
+            Ready to Create?
+          </h2>
+          <p className="text-white/40 mb-8">
+            Transform your next listing into cinema.
+          </p>
+          <Link
+            href="/studio"
+            className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black font-semibold rounded-xl hover:bg-white/90 transition-all"
+          >
+            <Play className="w-4 h-4" />
+            Open Studio
+          </Link>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-10 px-6 border-t border-white/[0.04]">
+        <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-white/20">
+          <span>&copy; 2026 Apex Luxury Intelligence Suite</span>
+          <span>Real Estate Video Generation</span>
+        </div>
+      </footer>
     </div>
   );
 }
