@@ -1,0 +1,12 @@
+{
+  "plugins": {
+    "superpowers": {
+      "name": "superpowers",
+      "version": "4.1.1",
+      "source": "https://github.com/obra/superpowers",
+      "marketplace": "claude-plugins-official",
+      "path": ".claude/plugins/superpowers",
+      "enabled": true
+    }
+  }
+}
