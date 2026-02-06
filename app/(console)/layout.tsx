@@ -40,16 +40,16 @@ export default function ConsoleLayout({
   // Show loading state while checking auth
   if (!isLoaded || !isSignedIn) {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+      <div className="min-h-screen bg-transparent flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#050505] text-[#FAFAFA] flex font-sans">
+    <div className="min-h-screen bg-transparent text-[#FAFAFA] flex font-sans">
       {/* Sidebar */}
-      <aside className="w-64 border-r border-white/[0.06] flex flex-col bg-[#050505]/80 backdrop-blur-xl fixed h-full z-40">
+      <aside className="w-64 border-r border-white/[0.06] flex flex-col bg-black/40 backdrop-blur-xl fixed h-full z-40">
         {/* Logo */}
         <div className="p-8 border-b border-white/[0.06]">
           <Link href="/" className="flex items-center gap-3 group">
@@ -127,7 +127,7 @@ export default function ConsoleLayout({
       {/* Main Content Area */}
       <div className="flex-1 ml-64">
         {/* Topbar */}
-        <header className="h-20 border-b border-white/[0.06] bg-[#050505]/80 backdrop-blur-xl sticky top-0 z-30 flex items-center justify-between px-10">
+        <header className="h-20 border-b border-white/[0.06] bg-black/40 backdrop-blur-xl sticky top-0 z-30 flex items-center justify-between px-10">
           <div>
             <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-white/40">
               {NAV_ITEMS.find(item => item.href === pathname)?.label || "Dashboard"}
