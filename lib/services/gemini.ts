@@ -35,7 +35,7 @@ export async function generateVideoScript(
   options: ScriptOptions
 ): Promise<VideoScript> {
   const genAI = getGeminiClient();
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-3-pro-preview' });
 
   const prompt = buildScriptPrompt(property, options);
 
@@ -150,7 +150,7 @@ export async function generateInsightsAnalysis(
   uiUxPatterns: { value: string }[];
 }> {
   const genAI = getGeminiClient();
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
 
   const prompt = `
 Analyze this website content and extract strategic insights.

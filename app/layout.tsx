@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   description:
     "AI-Powered Video Production Suite for Real Estate. Generate stunning property videos from any listing URL in minutes. Powered by Firecrawl + Remotion + Gemini.",
   openGraph: {
-    title: "Real Easy Realty",
+    title: "Apex Luxury | AI Intelligence Suite",
     description: "Transform any listing URL into professional marketing videos with AI",
     type: "website",
   },

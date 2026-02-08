@@ -65,7 +65,7 @@ async function generateScript(
   await updateJobStatus(jobId, 'generating', 30);
 
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-3-pro-preview' });
 
   const prompt = buildScriptPrompt(propertyData, videoType);
 
