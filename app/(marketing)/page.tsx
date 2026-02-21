@@ -303,13 +303,6 @@ export default function MarketingPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-10 px-6 border-t border-white/[0.04]">
-        <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-white/20">
-          <span>&copy; 2026 Apex Luxury Intelligence Suite</span>
-          <span>Real Estate Video Generation</span>
-        </div>
-      </footer>
     </div>
   );
 }

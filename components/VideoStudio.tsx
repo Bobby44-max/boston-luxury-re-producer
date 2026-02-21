@@ -38,7 +38,7 @@ interface PropertyData {
 
 interface VideoJob {
   id: string;
-  status: "pending" | "scraping" | "generating" | "rendering" | "complete" | "failed";
+  status: "pending" | "scraping" | "scraped" | "generating" | "script_ready" | "voiceover" | "voiceover_ready" | "rendering" | "complete" | "failed";
   progress: number;
   propertyData?: PropertyData;
   script?: string;
@@ -225,12 +225,27 @@ export default function VideoStudio() {
   const getStepStatus = (step: string) => {
     if (!currentJob) return { isActive: false, isComplete: false };
 
-    const steps = ["pending", "scraping", "generating", "rendering", "complete"];
-    const currentIndex = steps.indexOf(currentJob.status);
-    const stepIndex = steps.indexOf(step);
+    // Map all statuses to their pipeline phase for step tracking
+    const statusToPhase: Record<string, string> = {
+      pending: "pending",
+      scraping: "scraping",
+      scraped: "scraping",
+      generating: "generating",
+      script_ready: "generating",
+      voiceover: "generating",
+      voiceover_ready: "generating",
+      rendering: "rendering",
+      complete: "complete",
+      failed: "failed",
+    };
+
+    const phases = ["pending", "scraping", "generating", "rendering", "complete"];
+    const currentPhase = statusToPhase[currentJob.status] || currentJob.status;
+    const currentIndex = phases.indexOf(currentPhase);
+    const stepIndex = phases.indexOf(step);
 
     return {
-      isActive: currentJob.status === step,
+      isActive: currentPhase === step,
       isComplete: currentIndex > stepIndex,
     };
   };
@@ -239,14 +254,12 @@ export default function VideoStudio() {
     <div className="glass-panel p-8 animate-fade-in">
       {/* Header */}
       <div className="flex items-center gap-4 mb-8">
-        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500 via-violet-500 to-pink-500 flex items-center justify-center shadow-lg shadow-cyan-500/20">
-          <Video className="w-7 h-7 text-white" />
+        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
+          <Video className="w-7 h-7 text-black" />
         </div>
         <div>
-          <h3 className="text-2xl font-bold">
-            <span className="gradient-text">AI Video Studio</span>
-          </h3>
-          <p className="text-sm text-white/50">Paste any listing URL → Get a stunning video in minutes</p>
+          <h3 className="text-2xl font-bold">AI Video Studio</h3>
+          <p className="text-sm text-white/50">Paste any listing URL to generate a professional video</p>
         </div>
       </div>
 

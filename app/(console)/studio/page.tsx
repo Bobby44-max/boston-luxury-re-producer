@@ -95,22 +95,39 @@ export default function StudioPage() {
         const response = await fetch(`/api/video/status?id=${jobId}`);
         const data = await response.json();
 
-        if (data.status) {
-          setStatus(data.status as JobStatus);
-          setProgress(data.progress || STATUS_PROGRESS[data.status as JobStatus]);
+        // API returns { success, job: { status, progress, ... } }
+        const job = data.job || data;
+
+        if (job.status) {
+          // Map API statuses to UI statuses
+          const statusMap: Record<string, JobStatus> = {
+            pending: "pending",
+            scraping: "scraping",
+            scraped: "scraped",
+            generating: "generating",
+            script_ready: "script_ready",
+            voiceover: "voiceover",
+            voiceover_ready: "voiceover_ready",
+            rendering: "rendering",
+            complete: "complete",
+            failed: "error",
+          };
+          const mappedStatus = statusMap[job.status] || (job.status as JobStatus);
+          setStatus(mappedStatus);
+          setProgress(job.progress || STATUS_PROGRESS[mappedStatus] || 0);
         }
 
-        if (data.propertyData) {
-          setPropertyData(data.propertyData);
+        if (job.propertyData) {
+          setPropertyData(job.propertyData);
         }
 
-        if (data.status === "complete" && data.videoUrl) {
-          setVideoUrl(data.videoUrl);
+        if (job.status === "complete" && job.videoUrl) {
+          setVideoUrl(job.videoUrl);
           clearInterval(pollInterval);
         }
 
-        if (data.status === "error" || data.error) {
-          setError(data.error || "An error occurred");
+        if (job.status === "failed" || job.error) {
+          setError(job.error || "An error occurred");
           setStatus("error");
           clearInterval(pollInterval);
         }

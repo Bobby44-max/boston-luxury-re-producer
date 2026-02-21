@@ -10,13 +10,15 @@ export default {
     extend: {
       colors: {
         glass: {
-          bg: "#09090B",
-          card: "rgba(255,255,255,0.03)",
+          bg: "#0A0A0C",
+          card: "rgba(255,255,255,0.02)",
           border: "rgba(255,255,255,0.06)",
           hover: "rgba(255,255,255,0.08)",
         },
         accent: {
-          cyan: "#0dccf2",
+          indigo: "#6366f1",
+          rose: "#f43f5e",
+          cyan: "#06b6d4",
           violet: "#8b5cf6",
           orange: "#f97316",
           pink: "#ec4899",
@@ -33,9 +35,9 @@ export default {
       boxShadow: {
         glass: "0 8px 32px rgba(0, 0, 0, 0.3)",
         "glass-lg": "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
-        "glow-cyan": "0 0 40px rgba(13, 204, 242, 0.15)",
+        "glow-amber": "0 0 40px rgba(245, 158, 11, 0.15)",
+        "glow-cyan": "0 0 40px rgba(6, 182, 212, 0.15)",
         "glow-violet": "0 0 40px rgba(139, 92, 246, 0.15)",
-        "glow-orange": "0 0 40px rgba(249, 115, 22, 0.15)",
       },
     },
   },

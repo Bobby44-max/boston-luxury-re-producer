@@ -28,4 +28,8 @@ export declare const api: {
     get: FunctionReference<"query">;
     remove: FunctionReference<"mutation">;
   };
+  agentProfiles: {
+    getByUser: FunctionReference<"query">;
+    upsert: FunctionReference<"mutation">;
+  };
 };
