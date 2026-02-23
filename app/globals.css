@@ -3,15 +3,12 @@
 @tailwind utilities;
 
 :root {
-  --glass-bg: #09090b;
-  --glass-card: rgba(255, 255, 255, 0.03);
-  --glass-border: rgba(255, 255, 255, 0.06);
-  --glass-hover: rgba(255, 255, 255, 0.08);
-  --accent-cyan: #0dccf2;
-  --accent-violet: #8b5cf6;
-  --accent-orange: #f97316;
-  --accent-pink: #ec4899;
-  --accent-green: #22c55e;
+  --background: #0D0D12;
+  --foreground: #FAF8F5;
+  --primary: #0D0D12;
+  --accent: #C9A84C;
+  --surface: #FAF8F5;
+  --text-dark: #2A2A35;
 }
 
 * {
@@ -19,9 +16,9 @@
 }
 
 body {
-  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
-  background-color: var(--glass-bg);
-  color: #ffffff;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  background-color: var(--background);
+  color: var(--foreground);
   overflow-x: hidden;
   min-height: 100vh;
 }

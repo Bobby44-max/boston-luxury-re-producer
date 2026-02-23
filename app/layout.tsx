@@ -1,40 +1,34 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Plus_Jakarta_Sans, Inter, Playfair_Display, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ConvexClientProvider } from "@/components/ConvexProvider";
 
-const plusJakarta = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
-  variable: "--font-plus-jakarta",
-});
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const playfair = Playfair_Display({ subsets: ["latin"], style: ["italic"], weight: ["700"], variable: "--font-playfair" });
+const jetbrains = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrains" });
 
 export const metadata: Metadata = {
   title: "Real Easy Realty | AI Video Production Suite",
-  description:
-    "AI-Powered Video Production Suite for Real Estate. Generate stunning property videos from any listing URL in minutes. Powered by Firecrawl + Remotion + Gemini.",
-  openGraph: {
-    title: "Real Easy Realty",
-    description: "Transform any listing URL into professional marketing videos with AI",
-    type: "website",
-  },
+  description: "AI-Powered Video Production Suite for Real Estate.",
+  openGraph: { title: "Real Easy Realty", description: "Transform any listing URL into professional marketing videos with AI", type: "website" },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <ClerkProvider>
       <html lang="en" className="dark">
-        <body className={`${plusJakarta.variable} font-sans antialiased bg-[#0A0A0A]`}>
+        <body className={`${inter.variable} ${playfair.variable} ${jetbrains.variable} font-sans antialiased`}>
           <ConvexClientProvider>
-            {/* Ambient Gradient Orbs */}
-            <div className="ambient-gradient gradient-cyan" />
-            <div className="ambient-gradient gradient-violet" />
-            <div className="ambient-gradient gradient-orange" />
+            {/* Global Noise Overlay */}
+            <div className="pointer-events-none fixed inset-0 z-50 h-full w-full opacity-[0.05]">
+              <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <filter id="noise">
+                  <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
+                </filter>
+                <rect width="100%" height="100%" filter="url(#noise)" />
+              </svg>
+            </div>
             {children}
           </ConvexClientProvider>
         </body>
