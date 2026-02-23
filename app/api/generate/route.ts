@@ -44,8 +44,7 @@ async function generateWithGemini(prompt: string): Promise<string> {
   const genAI = getGeminiClient();
   // Note: Google Search Grounding is incompatible with JSON response mode
   // Using standard generation with JSON output
-  model: "gemini-3-pro-preview",
-
+  const model = genAI.getGenerativeModel({ model: "gemini-3-pro-preview" });
   const result = await model.generateContent({
     contents: [{ role: "user", parts: [{ text: prompt }] }],
     generationConfig: {
