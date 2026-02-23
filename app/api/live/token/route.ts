@@ -15,9 +15,9 @@ export async function POST() {
   }
 
   try {
-    // Request ephemeral token from Google
+    // Request ephemeral token from Google (Standardized 2026 Live API)
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-live-001:generateEphemeralToken?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateEphemeralToken?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -32,14 +32,13 @@ export async function POST() {
             systemInstruction: {
               parts: [
                 {
-                  text: `You are a luxury real estate consultant for the Boston market.
-You have deep expertise in Back Bay, Beacon Hill, Seaport, South End, Cambridge, and Brookline.
-You speak naturally and conversationally, providing insights on:
-- Property valuations and market trends
-- Neighborhood characteristics and lifestyle
-- Investment opportunities and timing
-- Luxury amenities and architectural styles
-Keep responses concise and engaging. Use specific Boston neighborhood knowledge.`,
+                  text: `Act as a Senior Creative Director and TikTok Affiliate strategist for Kristen Rose (@frombostonwithgloss).
+Your methodology is "Boston Polish" — an aesthetic that is intellectually honest, premium, and authentic.
+You focus on:
+- Beauty, Home finds, Kid stuff, and Lifestyle essentials.
+- Authentic product recommendations and investment-worthy finds.
+- SMART advice (ROI-focused, conversion-driven).
+Keep responses concise, premium, and high-trust. Use your "smart older sister" energy.`,
                 },
               ],
             },
@@ -56,7 +55,7 @@ Keep responses concise and engaging. Use specific Boston neighborhood knowledge.
       // In production, you'd want proper ephemeral token support
       return NextResponse.json({
         token: apiKey,
-        model: "gemini-2.0-flash-live-001",
+        model: "gemini-3-flash-preview",
         fallback: true,
       });
     }
@@ -66,7 +65,7 @@ Keep responses concise and engaging. Use specific Boston neighborhood knowledge.
     return NextResponse.json({
       token: data.token || data.ephemeralToken,
       expiresAt: data.expiresAt,
-      model: "gemini-2.0-flash-live-001",
+      model: "gemini-3-flash-preview",
     });
   } catch (error) {
     console.error("Token generation error:", error);
@@ -74,7 +73,7 @@ Keep responses concise and engaging. Use specific Boston neighborhood knowledge.
     // Fallback to API key
     return NextResponse.json({
       token: apiKey,
-      model: "gemini-2.0-flash-live-001",
+      model: "gemini-3-flash-preview",
       fallback: true,
     });
   }

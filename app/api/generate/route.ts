@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createGoogleGenerativeAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // ==================== KNOWLEDGE BASE ====================
 const PLAYBOOK_KNOWLEDGE = `
@@ -32,21 +32,19 @@ const PLAYBOOK_KNOWLEDGE = `
 - Lead Conversion: Property valuation calculators increase leads by 238%
 `;
 
-function getGeminiClient() {
+function getGeminiClient(): GoogleGenerativeAI {
   const apiKey = process.env.GEMINI_API_KEY_FIREBASE || process.env.GEMINI_API_KEY;
   if (!apiKey) {
     throw new Error("GEMINI_API_KEY not configured");
   }
-  return createGoogleGenerativeAI({ apiKey });
+  return new GoogleGenerativeAI(apiKey);
 }
 
 async function generateWithGemini(prompt: string): Promise<string> {
   const genAI = getGeminiClient();
   // Note: Google Search Grounding is incompatible with JSON response mode
   // Using standard generation with JSON output
-  const model = genAI.getGenerativeModel({
-    model: "gemini-3.1-pro",
-  });
+  model: "gemini-3-pro-preview",
 
   const result = await model.generateContent({
     contents: [{ role: "user", parts: [{ text: prompt }] }],

@@ -1,4 +1,14 @@
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import { Property } from './firecrawl';
 
+// Initialize Gemini client
+export function getGeminiClient() {
+  const apiKey = process.env.GEMINI_API_KEY_FIREBASE || process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error('GEMINI_API_KEY not configured');
+  }
+  return new GoogleGenerativeAI(apiKey);
+}
 
 export interface VideoScript {
   narration: string;
@@ -25,7 +35,7 @@ export async function generateVideoScript(
   options: ScriptOptions
 ): Promise<VideoScript> {
   const genAI = getGeminiClient();
-  const model = genAI.getGenerativeModel({ model: 'gemini-3.1-pro' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-3-pro-preview' });
 
   const prompt = buildScriptPrompt(property, options);
 
@@ -140,7 +150,7 @@ export async function generateInsightsAnalysis(
   uiUxPatterns: { value: string }[];
 }> {
   const genAI = getGeminiClient();
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
 
   const prompt = `
 Analyze this website content and extract strategic insights.

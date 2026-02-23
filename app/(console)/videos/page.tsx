@@ -32,24 +32,24 @@ export default function VideosPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold mb-1">My Videos</h1>
-          <p className="text-white/50">{VIDEOS.length} videos in your library</p>
+          <h1 className="text-3xl font-bold font-syne uppercase tracking-tight mb-1">My <span className="text-white/20">Library.</span></h1>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-white/40">{VIDEOS.length} intelligence assets archive</p>
         </div>
       </div>
 
       {/* Search & Filter */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 reveal">
         <div className="flex-1 relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
           <input
             type="text"
-            placeholder="Search videos..."
+            placeholder="Search Intelligence..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-11 pr-4 py-3 bg-white/[0.02] border border-white/[0.06] rounded-xl text-sm focus:outline-none focus:border-white/[0.12] transition-colors"
+            className="w-full pl-11 pr-4 py-3 premium-glass text-sm focus:outline-none focus:border-accent-indigo transition-colors"
           />
         </div>
-        <button className="flex items-center gap-2 px-4 py-3 bg-white/[0.02] border border-white/[0.06] rounded-xl text-sm hover:bg-white/[0.04] transition-colors">
+        <button className="flex items-center gap-2 px-6 py-3 premium-glass text-sm hover:bg-white/10 transition-colors">
           <Filter className="w-4 h-4" />
           Filter
         </button>
@@ -60,15 +60,15 @@ export default function VideosPage() {
         {filteredVideos.map((video) => (
           <div
             key={video.id}
-            className="group rounded-2xl bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.12] transition-all overflow-hidden"
+            className="group premium-glass reveal overflow-hidden"
           >
             {/* Thumbnail */}
             <div className="aspect-video bg-white/[0.04] relative flex items-center justify-center">
-              <Play className="w-12 h-12 text-white/20" />
+              <Play className="w-12 h-12 text-white/10" />
 
               {/* Duration Badge */}
               {video.duration !== "--" && (
-                <span className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 rounded text-xs">
+                <span className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 rounded text-[10px] font-bold uppercase tracking-widest">
                   {video.duration}
                 </span>
               )}
@@ -76,15 +76,15 @@ export default function VideosPage() {
               {/* Status Badge */}
               {video.status === "rendering" && (
                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                  <div className="flex items-center gap-2 text-amber-400">
-                    <div className="w-4 h-4 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
-                    <span className="text-sm">Rendering...</span>
+                  <div className="flex items-center gap-2 text-accent-indigo">
+                    <div className="w-4 h-4 border-2 border-accent-indigo border-t-transparent rounded-full animate-spin" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest">Synthesizing...</span>
                   </div>
                 </div>
               )}
 
               {/* Hover Overlay */}
-              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
                 <button className="p-3 bg-white/10 rounded-xl hover:bg-white/20 transition-colors">
                   <Play className="w-5 h-5" />
                 </button>
@@ -95,19 +95,19 @@ export default function VideosPage() {
             </div>
 
             {/* Info */}
-            <div className="p-4">
+            <div className="p-5">
               <div className="flex items-start justify-between gap-2">
-                <h3 className="font-medium text-sm truncate flex-1">{video.title}</h3>
+                <h3 className="font-bold text-sm truncate flex-1 tracking-tight">{video.title}</h3>
                 <button className="p-1 hover:bg-white/[0.04] rounded transition-colors">
                   <MoreVertical className="w-4 h-4 text-white/40" />
                 </button>
               </div>
-              <div className="flex items-center gap-3 mt-2 text-xs text-white/40">
-                <span>{video.createdAt}</span>
+              <div className="flex items-center gap-3 mt-2">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-white/20">{video.createdAt}</span>
                 {video.views > 0 && (
                   <>
-                    <span>•</span>
-                    <span>{video.views} views</span>
+                    <span className="text-white/10">•</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-accent-indigo">{video.views} engagements</span>
                   </>
                 )}
               </div>

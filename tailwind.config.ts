@@ -24,7 +24,8 @@ export default {
         },
       },
       fontFamily: {
-        sans: ["Plus Jakarta Sans", "system-ui", "sans-serif"],
+        sans: ["var(--font-plus-jakarta)", "system-ui", "sans-serif"],
+        syne: ["var(--font-syne)", "sans-serif"],
       },
       backdropBlur: {
         glass: "24px",
