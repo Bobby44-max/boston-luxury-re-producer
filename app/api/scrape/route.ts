@@ -39,13 +39,13 @@ export async function POST(request: NextRequest) {
 
       case 'geo-audit': {
         const scrape = await scrapeAdvanced(url, { formats: ['markdown'] });
-        result = await runGEOAudit(url, scrape.markdown || '');
+        result = await runGEOAudit(url, (scrape as any).markdown || '');
         break;
       }
 
       case 'design-dna': {
         const scrape = await scrapeAdvanced(url, { formats: ['branding', 'screenshot'] });
-        result = await extractDesignDNA(url, scrape.branding || {});
+        result = await extractDesignDNA(url, (scrape as any).branding || {});
         break;
       }
 
