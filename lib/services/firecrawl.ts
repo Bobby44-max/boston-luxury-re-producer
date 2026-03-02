@@ -202,7 +202,7 @@ export async function scrapeAdvanced(url: string, options: ScrapeOptions = {}) {
 
   try {
     const result = await firecrawl.scrapeUrl(url, {
-      formats,
+      formats: formats as any,
       onlyMainContent,
       actions: [], // Can add scroll/click actions here
     });
