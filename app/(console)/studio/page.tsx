@@ -30,6 +30,47 @@ const VIDEO_TYPES = [
   { id: "just-listed", name: "Just Listed", duration: "12s", aspect: "9:16" },
 ];
 
+type JobStatus =
+  | "idle"
+  | "pending"
+  | "scraping"
+  | "scraped"
+  | "generating"
+  | "script_ready"
+  | "voiceover"
+  | "voiceover_ready"
+  | "rendering"
+  | "complete"
+  | "error";
+
+const STATUS_LABELS: Record<JobStatus, string> = {
+  idle: "Ready",
+  pending: "Starting...",
+  scraping: "Extracting property data...",
+  scraped: "Property data extracted",
+  generating: "Writing script...",
+  script_ready: "Script complete",
+  voiceover: "Generating voiceover...",
+  voiceover_ready: "Voiceover ready",
+  rendering: "Rendering video...",
+  complete: "Complete!",
+  error: "Error occurred",
+};
+
+const STATUS_PROGRESS: Record<JobStatus, number> = {
+  idle: 0,
+  pending: 5,
+  scraping: 15,
+  scraped: 25,
+  generating: 40,
+  script_ready: 50,
+  voiceover: 60,
+  voiceover_ready: 70,
+  rendering: 85,
+  complete: 100,
+  error: 0,
+};
+
 // --- Result Components ---
 
 const GEOAuditResult = ({ data }: { data: any }) => (

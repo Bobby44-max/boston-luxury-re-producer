@@ -218,6 +218,41 @@ export async function scrapeAdvanced(url: string, options: ScrapeOptions = {}) {
   }
 }
 
+// Select best images for video
+export function selectBestImages(images: string[], count: number = 10): string[] {
+  // Prioritize by filename patterns
+  const categorized = {
+    exterior: images.filter(i => /exterior|front|street|aerial|drone/i.test(i)),
+    kitchen: images.filter(i => /kitchen/i.test(i)),
+    living: images.filter(i => /living|family|great|main/i.test(i)),
+    bedroom: images.filter(i => /bedroom|master|primary/i.test(i)),
+    bathroom: images.filter(i => /bath/i.test(i)),
+    other: [] as string[],
+  };
+
+  // Remaining images
+  const usedUrls = new Set([
+    ...categorized.exterior,
+    ...categorized.kitchen,
+    ...categorized.living,
+    ...categorized.bedroom,
+    ...categorized.bathroom,
+  ]);
+  categorized.other = images.filter(i => !usedUrls.has(i));
+
+  // Combine in priority order with high-res conversion
+  return [
+    ...categorized.exterior.slice(0, 2),
+    ...categorized.kitchen.slice(0, 2),
+    ...categorized.living.slice(0, 2),
+    ...categorized.bedroom.slice(0, 2),
+    ...categorized.bathroom.slice(0, 1),
+    ...categorized.other,
+  ]
+    .slice(0, count)
+    .map(getHighResImage);
+}
+
 // Firecrawl Agent Mode for complex multi-step research
 export async function runIntelligenceAgent(prompt: string, schema?: any) {
   const apiKey = process.env.FIRECRAWL_API_KEY;
