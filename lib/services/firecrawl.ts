@@ -183,37 +183,63 @@ export function getHighResImage(url: string): string {
   return url;
 }
 
-// Select best images for video
-export function selectBestImages(images: string[], count: number = 10): string[] {
-  // Prioritize by filename patterns
-  const categorized = {
-    exterior: images.filter(i => /exterior|front|street|aerial|drone/i.test(i)),
-    kitchen: images.filter(i => /kitchen/i.test(i)),
-    living: images.filter(i => /living|family|great|main/i.test(i)),
-    bedroom: images.filter(i => /bedroom|master|primary/i.test(i)),
-    bathroom: images.filter(i => /bath/i.test(i)),
-    other: [] as string[],
-  };
+// Advanced extraction options for Web Intelligence
+export interface ScrapeOptions {
+  formats?: ('markdown' | 'html' | 'rawHtml' | 'screenshot' | 'links' | 'summary' | 'branding')[];
+  maxAge?: number; // Caching in seconds
+  waitFor?: number;
+  onlyMainContent?: boolean;
+}
 
-  // Remaining images
-  const usedUrls = new Set([
-    ...categorized.exterior,
-    ...categorized.kitchen,
-    ...categorized.living,
-    ...categorized.bedroom,
-    ...categorized.bathroom,
-  ]);
-  categorized.other = images.filter(i => !usedUrls.has(i));
+// Scrape website with high-fidelity intelligence formats
+export async function scrapeAdvanced(url: string, options: ScrapeOptions = {}) {
+  const firecrawl = getFirecrawlClient();
+  const { 
+    formats = ['markdown', 'branding', 'screenshot'], 
+    maxAge = 3600, // 1 hour cache default
+    onlyMainContent = true 
+  } = options;
 
-  // Combine in priority order with high-res conversion
-  return [
-    ...categorized.exterior.slice(0, 2),
-    ...categorized.kitchen.slice(0, 2),
-    ...categorized.living.slice(0, 2),
-    ...categorized.bedroom.slice(0, 2),
-    ...categorized.bathroom.slice(0, 1),
-    ...categorized.other,
-  ]
-    .slice(0, count)
-    .map(getHighResImage);
+  try {
+    const result = await firecrawl.scrapeUrl(url, {
+      formats,
+      onlyMainContent,
+      actions: [], // Can add scroll/click actions here
+    });
+
+    if (!result.success) {
+      throw new Error(`Firecrawl scrape failed: ${result.error}`);
+    }
+
+    return result;
+  } catch (error) {
+    console.error('Firecrawl advanced scrape error:', error);
+    throw error;
+  }
+}
+
+// Firecrawl Agent Mode for complex multi-step research
+export async function runIntelligenceAgent(prompt: string, schema?: any) {
+  const apiKey = process.env.FIRECRAWL_API_KEY;
+  
+  // Note: Using fetch directly as the JS SDK might not support /agent yet
+  const response = await fetch('https://api.firecrawl.dev/v1/agent', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      prompt,
+      schema,
+      model: 'spark-1-pro' // Recommended for frontier accuracy
+    })
+  });
+
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(`Firecrawl Agent Error: ${err}`);
+  }
+
+  return response.json();
 }

@@ -139,46 +139,97 @@ Return JSON:
 `;
 }
 
-// Generate insights from website analysis
-export async function generateInsightsAnalysis(
-  url: string,
-  rawData: string
-): Promise<{
-  brandingStrategies: { value: string }[];
-  seoKeywords: { value: string }[];
-  aeoGeoOptimizationTactics: { value: string }[];
-  uiUxPatterns: { value: string }[];
-}> {
+// Advanced reasoning with Gemini 1.5 Pro
+export async function reason(
+  systemPrompt: string,
+  userPrompt: string,
+  options: { model?: string; temperature?: number; responseMimeType?: string } = {}
+) {
   const genAI = getGeminiClient();
-  const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
-
-  const prompt = `
-Analyze this website content and extract strategic insights.
-
-URL: ${url}
-Content: ${rawData.slice(0, 10000)}
-
-Return JSON with these arrays (each item has a "value" field):
-
-1. brandingStrategies (5 items): Unique positioning strategies visible
-2. seoKeywords (7 items): High-value SEO keywords for this industry
-3. aeoGeoOptimizationTactics (5 items): AI/search optimization tactics
-4. uiUxPatterns (6 items): Notable UI/UX design patterns
-
-Focus on actionable, specific insights. Be creative and thorough.
-`;
+  const model = genAI.getGenerativeModel({ 
+    model: options.model || 'gemini-1.5-pro',
+    systemInstruction: systemPrompt 
+  });
 
   const result = await model.generateContent({
-    contents: [{ role: 'user', parts: [{ text: prompt }] }],
+    contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
     generationConfig: {
-      temperature: 0.8,
-      maxOutputTokens: 4096,
-      responseMimeType: 'application/json',
+      temperature: options.temperature ?? 0.7,
+      responseMimeType: options.responseMimeType || 'application/json',
     },
   });
 
   const text = result.response.text();
   if (!text) throw new Error('No response from AI');
+  
+  return options.responseMimeType === 'application/json' ? JSON.parse(text.trim()) : text;
+}
 
-  return JSON.parse(text.trim());
+// Blueprint B: Design DNA Cloner
+// Extracts CSS variables, palette, and typography for Shadcn implementation
+export async function extractDesignDNA(url: string, brandingData: any) {
+  const systemPrompt = `
+You are an elite UI Engineer and Design System Architect.
+Your goal is to extract the "Design DNA" from a website's raw branding data.
+Transform this into a machine-ready specification for a Shadcn/Tailwind implementation.
+
+Analyze:
+1. Visual Hierarchy: Line heights, font weights, spacing.
+2. Color Systems: Primary, secondary, accent, and semantic (success/error) colors.
+3. Shape Language: Border-radius (rounded-lg, rounded-full), border-widths.
+4. Typography: Font families, scale, and fallback fonts.
+`;
+
+  const userPrompt = `
+URL: ${url}
+Branding Data: ${JSON.stringify(brandingData)}
+
+Return a JSON object matching this structure:
+{
+  "theme": {
+    "colors": { "primary": "hex", "secondary": "hex", "accent": "hex", "background": "hex", "foreground": "hex" },
+    "typography": { "display": "font name", "body": "font name", "scale": "decimal" },
+    "shape": { "borderRadius": "string (e.g. 0.5rem)", "borderWidth": "string" }
+  },
+  "shadcnConfig": {
+    "cssVars": { "primary": "hsl", "background": "hsl", ... },
+    "radius": "number"
+  },
+  "visualSignature": "A 2-sentence description of the brand aesthetic"
+}
+`;
+
+  return reason(systemPrompt, userPrompt, { model: 'gemini-1.5-pro' });
+}
+
+// Blueprint A: SEO & GEO (Generative Engine Optimization) Audit
+export async function runGEOAudit(url: string, markdown: string) {
+  const systemPrompt = `
+You are a Research Intelligence Officer specializing in Generative Engine Optimization (GEO).
+Traditional SEO is dead; we optimize for AI Answer Engines (Perplexity, SearchGPT, Gemini).
+
+Focus on:
+1. Citability: How easy is it for an AI to cite this content?
+2. Entity Density: Are key industry entities clearly defined?
+3. Information Gain: Does this page provide unique data not found elsewhere?
+4. Technical Clarity: Semantic markup and structured data quality.
+`;
+
+  const userPrompt = `
+URL: ${url}
+Content: ${markdown.slice(0, 30000)}
+
+Provide a detailed GEO Audit in JSON format:
+{
+  "citatonScore": 0-100,
+  "optimizationOpportunities": [
+    { "area": "Entity Definition", "fix": "..." },
+    { "area": "Information Gain", "fix": "..." }
+  ],
+  "aeoTactics": ["list of 5 specific tactics"],
+  "contentGaps": ["what information is missing that an AI would want?"]
+}
+`;
+
+  return reason(systemPrompt, userPrompt, { model: 'gemini-1.5-pro' });
 }

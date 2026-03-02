@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { scrapeProperty, scrapeInsights, type Property, type Insights } from '@/lib/services/firecrawl';
+import { 
+  scrapeProperty, 
+  scrapeInsights, 
+  scrapeAdvanced, 
+  runIntelligenceAgent,
+  type Property, 
+  type Insights 
+} from '@/lib/services/firecrawl';
+import { runGEOAudit, extractDesignDNA } from '@/lib/services/gemini';
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,40 +19,58 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { url, type = 'property' } = body;
+    const { url, type = 'property', prompt, schema } = body;
 
-    if (!url) {
+    if (!url && type !== 'agent-research') {
       return NextResponse.json({ error: 'URL is required' }, { status: 400 });
     }
 
-    // Validate URL format
-    try {
-      new URL(url);
-    } catch {
-      return NextResponse.json({ error: 'Invalid URL format' }, { status: 400 });
-    }
+    // Handle different intelligence types
+    let result: any;
 
-    let data: Property | Insights;
+    switch (type) {
+      case 'property':
+        result = await scrapeProperty(url);
+        break;
+      
+      case 'insights':
+        result = await scrapeInsights(url);
+        break;
 
-    if (type === 'property') {
-      data = await scrapeProperty(url);
-    } else if (type === 'insights') {
-      data = await scrapeInsights(url);
-    } else {
-      return NextResponse.json({ error: 'Invalid type. Use "property" or "insights"' }, { status: 400 });
+      case 'geo-audit': {
+        const scrape = await scrapeAdvanced(url, { formats: ['markdown'] });
+        result = await runGEOAudit(url, scrape.markdown || '');
+        break;
+      }
+
+      case 'design-dna': {
+        const scrape = await scrapeAdvanced(url, { formats: ['branding', 'screenshot'] });
+        result = await extractDesignDNA(url, scrape.branding || {});
+        break;
+      }
+
+      case 'agent-research': {
+        if (!prompt) return NextResponse.json({ error: 'Prompt required for agent' }, { status: 400 });
+        result = await runIntelligenceAgent(prompt, schema);
+        break;
+      }
+
+      default:
+        return NextResponse.json({ error: 'Invalid intelligence type' }, { status: 400 });
     }
 
     return NextResponse.json({
       success: true,
-      data,
-      scrapedAt: new Date().toISOString(),
+      type,
+      data: result,
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
     console.error('Scrape API error:', error);
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to scrape URL',
+        error: error instanceof Error ? error.message : 'Failed to process intelligence request',
       },
       { status: 500 }
     );

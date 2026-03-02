@@ -42,7 +42,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider signInFallbackRedirectUrl="/studio" signUpFallbackRedirectUrl="/studio">
+    <ClerkProvider signInFallbackRedirectUrl="/dashboard" signUpFallbackRedirectUrl="/dashboard">
       <html lang="en" className="dark">
         <body className={`${plusJakarta.variable} ${syne.variable} font-sans antialiased bg-transparent text-white selection:bg-accent-indigo/30`}>
           <div className="boston-bg-overlay" />
