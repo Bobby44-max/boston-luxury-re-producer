@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Globe,
   Loader2,
