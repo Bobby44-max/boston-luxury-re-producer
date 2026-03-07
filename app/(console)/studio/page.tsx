@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useRef } from "react";
 import { useSearchParams } from "next/navigation";
+import Image from "next/image";
 import {
   Globe,
   Loader2,
@@ -12,6 +13,11 @@ import {
   Film,
   Wand2,
   RefreshCw,
+  ChevronRight,
+  Zap,
+  Layout,
+  Search,
+  Maximize2
 } from "lucide-react";
 
 const INTELLIGENCE_MODES = [
@@ -41,17 +47,17 @@ type JobStatus =
   | "error";
 
 const STATUS_LABELS: Record<JobStatus, string> = {
-  idle: "Ready",
-  pending: "Starting...",
-  scraping: "Extracting property data...",
-  scraped: "Property data extracted",
-  generating: "Writing script...",
-  script_ready: "Script complete",
-  voiceover: "Generating voiceover...",
-  voiceover_ready: "Voiceover ready",
-  rendering: "Rendering video...",
-  complete: "Complete!",
-  error: "Error occurred",
+  idle: "Awaiting Input",
+  pending: "Initializing Fleet...",
+  scraping: "Extracting Web DNA...",
+  scraped: "DNA Extraction Complete",
+  generating: "Synthesizing Narrative...",
+  script_ready: "Narrative Locked",
+  voiceover: "Generating AI Vocals...",
+  voiceover_ready: "Vocals Synchronized",
+  rendering: "Rendering 4K Cinema...",
+  complete: "Production Complete",
+  error: "Strategic Failure",
 };
 
 const STATUS_PROGRESS: Record<JobStatus, number> = {
@@ -72,32 +78,39 @@ const STATUS_PROGRESS: Record<JobStatus, number> = {
 
 const GEOAuditResult = ({ data }: { data: any }) => (
   <div className="space-y-6 animate-fade-in">
-    <div className="p-6 rounded-2xl bg-accent-indigo/10 border border-accent-indigo/20 flex items-center justify-between">
-      <div>
-        <h3 className="text-lg font-bold text-accent-indigo mb-1">GEO Citability Score</h3>
-        <p className="text-sm text-white/50">How effectively AI models can cite this content</p>
+    <div className="premium-glass p-8 rounded-[2rem] border border-blue-500/20 flex items-center justify-between group overflow-hidden relative">
+      <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+      <div className="relative z-10">
+        <h3 className="text-xl font-space font-bold text-blue-400 mb-1 tracking-tight">GEO Citability Score</h3>
+        <p className="text-sm text-white/40 font-light">How effectively AI models can cite this content</p>
       </div>
-      <div className="text-4xl font-black text-accent-indigo">{data.citationScore}%</div>
+      <div className="relative z-10 text-6xl font-space font-black text-blue-400 tabular-nums">{data.citationScore}%</div>
     </div>
 
-    <div className="grid md:grid-cols-2 gap-4">
-      <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.06]">
-        <h4 className="text-xs font-semibold text-white/40 uppercase tracking-wider mb-4">Optimization Gaps</h4>
-        <ul className="space-y-3">
+    <div className="grid md:grid-cols-2 gap-6">
+      <div className="premium-glass p-6 rounded-3xl border border-white/5">
+        <h4 className="text-[10px] font-space font-bold text-white/40 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+          <AlertCircle className="w-3 h-3 text-rose-500" />
+          Optimization Gaps
+        </h4>
+        <ul className="space-y-4">
           {data.contentGaps?.map((gap: string, i: number) => (
-            <li key={i} className="flex gap-3 text-sm text-white/70">
-              <AlertCircle className="w-4 h-4 text-accent-rose shrink-0" />
+            <li key={i} className="flex gap-4 text-sm text-white/60 font-light leading-relaxed">
+              <span className="w-1 h-1 rounded-full bg-rose-500/50 mt-2 shrink-0"></span>
               {gap}
             </li>
           ))}
         </ul>
       </div>
-      <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.06]">
-        <h4 className="text-xs font-semibold text-white/40 uppercase tracking-wider mb-4">AEO Tactics</h4>
-        <ul className="space-y-3">
+      <div className="premium-glass p-6 rounded-3xl border border-white/5">
+        <h4 className="text-[10px] font-space font-bold text-white/40 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+          <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+          Strategic Tactics
+        </h4>
+        <ul className="space-y-4">
           {data.aeoTactics?.map((tactic: string, i: number) => (
-            <li key={i} className="flex gap-3 text-sm text-white/70">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            <li key={i} className="flex gap-4 text-sm text-white/60 font-light leading-relaxed">
+              <span className="w-1 h-1 rounded-full bg-emerald-500/50 mt-2 shrink-0"></span>
               {tactic}
             </li>
           ))}
@@ -109,22 +122,22 @@ const GEOAuditResult = ({ data }: { data: any }) => (
 
 const DesignDNAResult = ({ data }: { data: any }) => (
   <div className="space-y-6 animate-fade-in">
-    <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.06]">
-      <h3 className="text-lg font-bold mb-2">Visual Signature</h3>
-      <p className="text-white/60 leading-relaxed italic">"{data.visualSignature}"</p>
+    <div className="premium-glass p-8 rounded-[2rem] border border-white/5">
+      <h3 className="text-[10px] font-space font-bold text-white/40 uppercase tracking-[0.2em] mb-4">Visual Signature</h3>
+      <p className="text-2xl font-space font-light text-white leading-tight italic">"{data.visualSignature}"</p>
     </div>
 
     <div className="grid md:grid-cols-2 gap-6">
       {/* Color Palette */}
       <div className="space-y-4">
-        <h4 className="text-xs font-semibold text-white/40 uppercase tracking-wider">Color Palette</h4>
+        <h4 className="text-[10px] font-space font-bold text-white/40 uppercase tracking-[0.2em] ml-2">Color Palette</h4>
         <div className="grid grid-cols-2 gap-3">
           {Object.entries(data.theme?.colors || {}).map(([name, hex]: [any, any]) => (
-            <div key={name} className="flex items-center gap-3 p-2 rounded-xl bg-white/[0.03] border border-white/[0.06]">
-              <div className="w-8 h-8 rounded-lg shadow-inner" style={{ backgroundColor: hex }} />
+            <div key={name} className="premium-glass p-3 rounded-2xl border border-white/5 flex items-center gap-4 group hover:border-white/20 transition-all">
+              <div className="w-10 h-10 rounded-xl shadow-[0_0_20px_rgba(0,0,0,0.5)] border border-white/10" style={{ backgroundColor: hex }} />
               <div>
-                <div className="text-[10px] text-white/40 uppercase font-bold">{name}</div>
-                <div className="text-xs font-mono">{hex}</div>
+                <div className="text-[9px] text-white/40 uppercase font-bold tracking-widest">{name}</div>
+                <div className="text-xs font-mono font-bold text-white/80 uppercase">{hex}</div>
               </div>
             </div>
           ))}
@@ -133,18 +146,24 @@ const DesignDNAResult = ({ data }: { data: any }) => (
 
       {/* Typography */}
       <div className="space-y-4">
-        <h4 className="text-xs font-semibold text-white/40 uppercase tracking-wider">Typography Scale</h4>
-        <div className="p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] space-y-4">
-          <div>
-            <div className="text-[10px] text-white/40 uppercase font-bold mb-1">Display Font</div>
-            <div className="text-xl" style={{ fontFamily: data.theme?.typography?.display }}>
+        <h4 className="text-[10px] font-space font-bold text-white/40 uppercase tracking-[0.2em] ml-2">Typography Scale</h4>
+        <div className="premium-glass p-6 rounded-2xl border border-white/5 space-y-6">
+          <div className="group">
+            <div className="text-[9px] text-white/40 uppercase font-bold tracking-widest mb-2 flex items-center gap-2">
+              <ChevronRight className="w-2 h-2 group-hover:translate-x-1 transition-transform" />
+              Display Font
+            </div>
+            <div className="text-2xl font-bold tracking-tight text-white" style={{ fontFamily: data.theme?.typography?.display }}>
               {data.theme?.typography?.display}
             </div>
           </div>
-          <div>
-            <div className="text-[10px] text-white/40 uppercase font-bold mb-1">Body Font</div>
-            <div className="text-sm opacity-60" style={{ fontFamily: data.theme?.typography?.body }}>
-              The quick brown fox jumps over the lazy dog.
+          <div className="group">
+            <div className="text-[9px] text-white/40 uppercase font-bold tracking-widest mb-2 flex items-center gap-2">
+              <ChevronRight className="w-2 h-2 group-hover:translate-x-1 transition-transform" />
+              Body Font
+            </div>
+            <div className="text-sm opacity-60 font-light leading-relaxed" style={{ fontFamily: data.theme?.typography?.body }}>
+              Experience the definitive standard for AI-driven luxury real estate marketing.
             </div>
           </div>
         </div>
@@ -152,23 +171,27 @@ const DesignDNAResult = ({ data }: { data: any }) => (
     </div>
 
     {/* Shadcn Config Export */}
-    <div className="p-4 rounded-xl bg-black border border-white/[0.1] font-mono text-[11px] overflow-x-auto">
-      <div className="flex justify-between items-center mb-2">
-        <span className="text-white/40">// shadcn-config.json</span>
+    <div className="premium-glass rounded-2xl border border-white/10 bg-black/40 p-1 group">
+      <div className="flex justify-between items-center p-3 px-5">
+        <span className="text-[9px] font-space font-bold text-white/30 uppercase tracking-[0.2em]">shadcn-config.json</span>
         <button 
           onClick={() => navigator.clipboard.writeText(JSON.stringify(data.shadcnConfig, null, 2))}
-          className="text-accent-indigo hover:text-white transition-colors"
+          className="text-[10px] font-space font-bold text-blue-400 hover:text-white transition-colors uppercase tracking-widest flex items-center gap-2"
         >
+          <Zap className="w-3 h-3" />
           Copy JSON
         </button>
       </div>
-      <pre className="text-emerald-400">{JSON.stringify(data.shadcnConfig, null, 2)}</pre>
+      <div className="p-6 rounded-xl bg-black/60 font-mono text-[11px] overflow-x-auto custom-scrollbar h-40">
+        <pre className="text-emerald-400/80">{JSON.stringify(data.shadcnConfig, null, 2)}</pre>
+      </div>
     </div>
   </div>
 );
 
 function StudioContent() {
   const searchParams = useSearchParams();
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const [url, setUrl] = useState(searchParams.get("url") || "");
   const [intelMode, setIntelMode] = useState("video");
@@ -231,7 +254,6 @@ function StudioContent() {
     setPropertyData(null);
 
     try {
-      // Use upgraded endpoint for intelligence modes
       const endpoint = intelMode === "video" ? "/api/video/generate" : "/api/scrape";
       const body = intelMode === "video" 
         ? { listingUrl: url, videoType }
@@ -276,230 +298,327 @@ function StudioContent() {
   const isGenerating = status !== "idle" && status !== "complete" && status !== "error";
 
   return (
-    <div className="min-h-screen pb-20">
-      {/* Header */}
-      <header className="mb-10">
-        <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">
-          Intelligence Studio
-        </h1>
-        <p className="text-white/40">
-          From video production to autonomous web intelligence
-        </p>
-      </header>
+    <div className="min-h-screen relative overflow-hidden bg-[#050505] text-white">
+      {/* Cinematic Background */}
+      <div className="absolute inset-0 z-0">
+        <Image 
+          src="/assets/re-deck/re_studio_3d.png" 
+          alt="Studio Background" 
+          fill 
+          className="object-cover opacity-40 scale-105 blur-sm"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#050505]/95 via-[#050505]/80 to-[#050505]"></div>
+      </div>
 
-      <div className="grid lg:grid-cols-5 gap-8">
-        {/* Left Panel - Configuration */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Intelligence Mode */}
-          <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.06]">
-            <label className="block text-xs font-semibold text-white/40 uppercase tracking-wider mb-4">
-              Intelligence Mode
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              {INTELLIGENCE_MODES.map((mode) => {
-                const Icon = mode.icon;
-                const isActive = intelMode === mode.id;
-                return (
-                  <button
-                    key={mode.id}
-                    onClick={() => setIntelMode(mode.id)}
-                    disabled={isGenerating}
-                    className={`p-4 rounded-xl border text-left transition-all ${
-                      isActive
-                        ? "bg-accent-indigo/10 border-accent-indigo/40 ring-1 ring-accent-indigo/20"
-                        : "border-white/[0.06] hover:border-white/[0.12]"
-                    } disabled:opacity-50`}
-                  >
-                    <Icon className={`w-5 h-5 mb-2 ${isActive ? "text-accent-indigo" : "text-white/20"}`} />
-                    <div className="font-semibold text-xs mb-1">{mode.name}</div>
-                    <div className="text-[10px] text-white/30 leading-tight">{mode.desc}</div>
-                  </button>
-                );
-              })}
+      <div className="relative z-10 max-w-[1600px] mx-auto px-8 py-12">
+        {/* Header */}
+        <header className="mb-12 flex justify-between items-end">
+          <div>
+            <h1 className="text-5xl font-space font-bold tracking-tighter mb-2">
+              Intelligence Studio
+            </h1>
+            <p className="text-white/40 font-light tracking-wide flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-gold-400" />
+              Multimodal reasoning for high-end real estate production
+            </p>
+          </div>
+          <div className="flex gap-4">
+            <div className="premium-glass px-4 py-2 rounded-full border border-white/10 text-[10px] font-space font-bold uppercase tracking-widest text-white/40">
+              Fleet Version: 2.1.0-Flash
+            </div>
+            <div className="status-badge status-live">
+              <span className="status-pulse"></span>
+              Gemini 1.5 Pro Live
             </div>
           </div>
+        </header>
 
-          {/* URL Input */}
-          {intelMode !== "agent-research" && (
-            <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.06]">
-              <label className="block text-xs font-semibold text-white/40 uppercase tracking-wider mb-3">
-                Source URL
+        <div className="grid lg:grid-cols-12 gap-10">
+          {/* Left Panel - Control Center */}
+          <div className="lg:col-span-4 space-y-8">
+            {/* Intelligence Mode Selection */}
+            <div className="premium-glass p-8 rounded-[2.5rem] border border-white/10">
+              <label className="block text-[10px] font-space font-bold text-white/30 uppercase tracking-[0.2em] mb-6">
+                Strategic Mode
               </label>
-              <div className="relative">
-                <Globe className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20" />
-                <input
-                  type="url"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  placeholder="Paste URL to analyze..."
-                  disabled={isGenerating}
-                  className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl py-4 pl-12 pr-4 text-[15px] placeholder:text-white/20 focus:outline-none focus:border-white/20 disabled:opacity-50"
-                />
+              <div className="grid grid-cols-2 gap-3">
+                {INTELLIGENCE_MODES.map((mode) => {
+                  const Icon = mode.icon;
+                  const isActive = intelMode === mode.id;
+                  return (
+                    <button
+                      key={mode.id}
+                      onClick={() => setIntelMode(mode.id)}
+                      disabled={isGenerating}
+                      className={`p-5 rounded-2xl border text-left transition-all relative overflow-hidden group ${
+                        isActive
+                          ? "bg-white/10 border-white/30 shadow-[0_0_20px_rgba(255,255,255,0.05)]"
+                          : "border-white/5 hover:border-white/20 bg-white/[0.02]"
+                      } disabled:opacity-50`}
+                    >
+                      {isActive && <motion.div layoutId="mode-active" className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent pointer-events-none" />}
+                      <Icon className={`w-6 h-6 mb-3 ${isActive ? "text-white" : "text-white/20"} group-hover:scale-110 transition-transform`} />
+                      <div className="font-space font-bold text-xs mb-1 tracking-tight text-white">{mode.name}</div>
+                      <div className="text-[10px] text-white/30 leading-tight font-light">{mode.desc}</div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
-          )}
 
-          {/* Agent Prompt */}
-          {intelMode === "agent-research" && (
-            <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.06]">
-              <label className="block text-xs font-semibold text-white/40 uppercase tracking-wider mb-3">
-                Research Objective
-              </label>
-              <textarea
-                value={agentPrompt}
-                onChange={(e) => setAgentPrompt(e.target.value)}
-                placeholder="Describe what you want the agent to find..."
-                disabled={isGenerating}
-                rows={4}
-                className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl p-4 text-[15px] placeholder:text-white/20 focus:outline-none focus:border-white/20 disabled:opacity-50 resize-none"
-              />
+            {/* Input Module */}
+            <div className="premium-glass p-8 rounded-[2.5rem] border border-white/10">
+              {intelMode !== "agent-research" ? (
+                <div className="space-y-4">
+                  <label className="block text-[10px] font-space font-bold text-white/30 uppercase tracking-[0.2em] mb-2">
+                    Source Intelligence URL
+                  </label>
+                  <div className="relative group">
+                    <div className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20 group-focus-within:text-white/50 transition-colors">
+                      <Globe className="w-5 h-5" />
+                    </div>
+                    <input
+                      type="url"
+                      value={url}
+                      onChange={(e) => setUrl(e.target.value)}
+                      placeholder="Paste property listing or site URL..."
+                      disabled={isGenerating}
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-5 pl-14 pr-6 text-sm font-light placeholder:text-white/10 focus:outline-none focus:border-white/30 focus:bg-white/[0.05] transition-all disabled:opacity-50"
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <label className="block text-[10px] font-space font-bold text-white/30 uppercase tracking-[0.2em] mb-2">
+                    Research Objective
+                  </label>
+                  <textarea
+                    value={agentPrompt}
+                    onChange={(e) => setAgentPrompt(e.target.value)}
+                    placeholder="Describe the research target (e.g., 'Analyze Seaport pricing trends and identify top 3 competitors')..."
+                    disabled={isGenerating}
+                    rows={4}
+                    className="w-full bg-white/[0.03] border border-white/10 rounded-2xl p-6 text-sm font-light placeholder:text-white/10 focus:outline-none focus:border-white/30 focus:bg-white/[0.05] transition-all disabled:opacity-50 resize-none custom-scrollbar"
+                  />
+                </div>
+              )}
             </div>
-          )}
 
-          {/* Video Options (Conditional) */}
-          {intelMode === "video" && (
-            <div className="space-y-6">
-              <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.06]">
-                <label className="block text-xs font-semibold text-white/40 uppercase tracking-wider mb-3">
-                  Format
+            {/* Format Options (Conditional) */}
+            {intelMode === "video" && (
+              <div className="premium-glass p-8 rounded-[2.5rem] border border-white/10">
+                <label className="block text-[10px] font-space font-bold text-white/30 uppercase tracking-[0.2em] mb-6">
+                  Production Format
                 </label>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {VIDEO_TYPES.map((type) => (
                     <button
                       key={type.id}
                       onClick={() => setVideoType(type.id)}
                       disabled={isGenerating}
-                      className={`w-full p-4 rounded-xl border text-left transition-all flex items-center justify-between ${
+                      className={`w-full p-5 rounded-2xl border text-left transition-all flex items-center justify-between group ${
                         videoType === type.id
-                          ? "bg-white/[0.05] border-white/20"
-                          : "border-white/[0.06] hover:border-white/[0.12]"
+                          ? "bg-white/10 border-white/30"
+                          : "border-white/5 hover:border-white/20 bg-white/[0.02]"
                       } disabled:opacity-50`}
                     >
-                      <div className="flex items-center gap-3">
-                        <Film className={`w-4 h-4 ${videoType === type.id ? "text-white" : "text-white/30"}`} />
-                        <span className="font-medium text-sm">{type.name}</span>
+                      <div className="flex items-center gap-4">
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center border transition-all ${videoType === type.id ? "bg-white/10 border-white/20 text-white" : "bg-white/[0.02] border-white/5 text-white/20"}`}>
+                          <Film className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <div className="font-space font-bold text-xs tracking-tight text-white">{type.name}</div>
+                          <div className="text-[10px] text-white/30 font-light">{type.aspect} Aspect Ratio</div>
+                        </div>
                       </div>
-                      <div className="text-[10px] text-white/30">
-                        {type.duration} · {type.aspect}
+                      <div className="text-[10px] font-space font-bold text-white/40 uppercase tracking-widest bg-white/5 px-3 py-1 rounded-full group-hover:bg-white/10 transition-colors">
+                        {type.duration}
                       </div>
                     </button>
                   ))}
                 </div>
               </div>
-            </div>
-          )}
-
-          {/* Execute Button */}
-          <button
-            onClick={isGenerating ? undefined : (status === "complete" || status === "error" ? handleReset : handleProcess)}
-            disabled={(!url.trim() && intelMode !== "agent-research") && status === "idle"}
-            className={`w-full py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2 ${
-              isGenerating
-                ? "bg-white/[0.05] text-white/50 cursor-wait"
-                : "btn-premium-solid"
-            }`}
-          >
-            {isGenerating ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin" />
-                Processing...
-              </>
-            ) : status === "complete" ? (
-              <>
-                <RefreshCw className="w-5 h-5" />
-                New Analysis
-              </>
-            ) : (
-              <>
-                <Sparkles className="w-5 h-5" />
-                {intelMode === "video" ? "Generate Video" : "Extract Intelligence"}
-              </>
-            )}
-          </button>
-        </div>
-
-        {/* Right Panel - Strategic Output */}
-        <div className="lg:col-span-3 space-y-6">
-          {/* Main Output Display */}
-          <div className="min-h-[400px] rounded-2xl bg-black border border-white/[0.06] overflow-hidden relative p-8 flex flex-col">
-            {!isGenerating && status === "idle" && (
-              <div className="flex-1 flex flex-col items-center justify-center text-center opacity-30">
-                <Sparkles className="w-12 h-12 mb-4" />
-                <p className="font-medium">Strategic output will appear here</p>
-                <p className="text-sm">Select a mode and provide a source URL</p>
-              </div>
             )}
 
-            {isGenerating && (
-              <div className="flex-1 flex flex-col items-center justify-center text-center">
-                <div className="w-16 h-16 rounded-full bg-accent-indigo/10 flex items-center justify-center mb-6 animate-pulse">
-                  <Loader2 className="w-8 h-8 text-accent-indigo animate-spin" />
-                </div>
-                <h3 className="text-xl font-bold mb-2">Synthesizing Web Intelligence</h3>
-                <p className="text-white/40 max-w-sm">
-                  Gemini 1.5 Pro is analyzing the source DNA using million-token multimodal reasoning...
-                </p>
-                
-                {/* Micro-Progress */}
-                <div className="w-full max-w-md mt-12">
-                  <div className="flex justify-between text-[10px] uppercase tracking-widest text-white/30 mb-2">
-                    <span>{STATUS_LABELS[status]}</span>
-                    <span>{progress}%</span>
-                  </div>
-                  <div className="h-1 bg-white/[0.05] rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-accent-indigo transition-all duration-500" 
-                      style={{ width: `${progress}%` }} 
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {status === "complete" && (
-              <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
-                {intelMode === "video" && videoUrl && (
-                  <div className="aspect-video rounded-xl overflow-hidden bg-black mb-6">
-                    <video src={videoUrl} controls autoPlay className="w-full h-full object-contain" />
-                  </div>
-                )}
-                
-                {intelMode === "geo-audit" && <GEOAuditResult data={intelResult} />}
-                {intelMode === "design-dna" && <DesignDNAResult data={intelResult} />}
-                {intelMode === "agent-research" && (
-                  <div className="prose prose-invert max-w-none">
-                    <h3 className="text-2xl font-bold mb-4">Autonomous Research Brief</h3>
-                    <div className="text-white/70 leading-relaxed whitespace-pre-wrap">{intelResult}</div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {status === "error" && (
-              <div className="flex-1 flex flex-col items-center justify-center text-center">
-                <div className="w-16 h-16 rounded-full bg-accent-rose/10 flex items-center justify-center mb-4">
-                  <AlertCircle className="w-8 h-8 text-accent-rose" />
-                </div>
-                <h3 className="text-xl font-bold text-accent-rose mb-2">Intelligence Failure</h3>
-                <p className="text-white/40 max-w-sm mb-6">{error}</p>
-                <button onClick={handleReset} className="btn-premium-solid text-xs">Reset Studio</button>
-              </div>
-            )}
+            {/* Execute Action */}
+            <button
+              onClick={isGenerating ? undefined : (status === "complete" || status === "error" ? handleReset : handleProcess)}
+              disabled={(!url.trim() && intelMode !== "agent-research") && status === "idle"}
+              className={`w-full py-6 rounded-[2rem] font-space font-bold uppercase tracking-[0.2em] text-xs transition-all flex items-center justify-center gap-3 relative overflow-hidden group ${
+                isGenerating
+                  ? "bg-white/5 text-white/40 cursor-wait border border-white/10"
+                  : status === "complete"
+                  ? "premium-glass border-white/20 text-white hover:bg-white/10"
+                  : "bg-white text-black hover:bg-gray-200 shadow-[0_20px_40px_rgba(255,255,255,0.1)] active:scale-95"
+              }`}
+            >
+              {isGenerating ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Fleet Processing
+                </>
+              ) : status === "complete" ? (
+                <>
+                  <RefreshCw className="w-4 h-4" />
+                  New Directive
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4" />
+                  Initialize Studio
+                </>
+              )}
+            </button>
           </div>
 
-          {/* Utility Actions (When Complete) */}
-          {status === "complete" && (
-            <div className="flex gap-4 animate-fade-in">
-              <button className="flex-1 py-4 rounded-xl bg-white/[0.05] border border-white/[0.1] font-bold text-sm hover:bg-white/[0.08] transition-all flex items-center justify-center gap-2">
-                <Download className="w-4 h-4" />
-                {intelMode === "video" ? "Download Video" : "Export Report"}
-              </button>
-              <button className="flex-1 py-4 rounded-xl bg-white/[0.05] border border-white/[0.1] font-bold text-sm hover:bg-white/[0.08] transition-all flex items-center justify-center gap-2">
-                <Sparkles className="w-4 h-4 text-accent-indigo" />
-                Refine with AI
-              </button>
+          {/* Right Panel - The Cinema / Intelligence Output */}
+          <div className="lg:col-span-8">
+            <div className="h-full flex flex-col space-y-8">
+              {/* Output Container */}
+              <div className="flex-1 min-h-[600px] premium-glass rounded-[3rem] border border-white/10 overflow-hidden relative group">
+                {/* Background Grid Pattern */}
+                <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
+                
+                {!isGenerating && status === "idle" && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-12">
+                    <div className="w-24 h-24 rounded-full bg-white/[0.02] border border-white/5 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-700">
+                      <Layout className="w-10 h-10 text-white/10" />
+                    </div>
+                    <h2 className="text-3xl font-space font-bold tracking-tight mb-4 text-white/60">Awaiting Strategic Directive</h2>
+                    <p className="text-white/20 font-light max-w-sm leading-relaxed">
+                      Initialize the fleet by providing a source URL or research objective. The studio will synthesize high-fidelity multimodal data into actionable assets.
+                    </p>
+                    <div className="mt-12 flex gap-8 items-center text-[10px] font-space font-bold text-white/10 uppercase tracking-[0.3em]">
+                      <span className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-white/10"></div> Video Rendering</span>
+                      <span className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-white/10"></div> GEO Audits</span>
+                      <span className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-white/10"></div> Design DNA</span>
+                    </div>
+                  </div>
+                )}
+
+                {isGenerating && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-12">
+                    <div className="relative mb-12">
+                      <div className="w-32 h-32 rounded-full border-2 border-white/5 animate-[spin_10s_linear_infinite]"></div>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center relative overflow-hidden">
+                          <motion.div 
+                            animate={{ y: [-20, 20], opacity: [0, 1, 0] }}
+                            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                            className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-500/20 to-transparent"
+                          />
+                          <Loader2 className="w-8 h-8 text-white animate-spin-slow" />
+                        </div>
+                      </div>
+                    </div>
+                    <h3 className="text-2xl font-space font-bold tracking-tight mb-2 uppercase tracking-[0.2em]">{STATUS_LABELS[status]}</h3>
+                    <p className="text-white/40 font-light max-w-xs leading-relaxed">
+                      Gemini 1.5 Pro is analyzing multimodal streams using massive token reasoning...
+                    </p>
+                    
+                    {/* Precision Progress Bar */}
+                    <div className="w-full max-w-md mt-16 space-y-3">
+                      <div className="flex justify-between text-[10px] font-space font-bold uppercase tracking-[0.3em] text-white/20">
+                        <span>Fleet Progress</span>
+                        <span className="text-white/60">{progress}%</span>
+                      </div>
+                      <div className="h-[2px] w-full bg-white/5 rounded-full relative overflow-hidden">
+                        <motion.div 
+                          initial={{ width: 0 }}
+                          animate={{ width: `${progress}%` }}
+                          transition={{ duration: 0.5 }}
+                          className="h-full bg-white shadow-[0_0_20px_white]"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {status === "complete" && (
+                  <div className="absolute inset-0 overflow-y-auto custom-scrollbar p-10 md:p-14">
+                    {intelMode === "video" && videoUrl && (
+                      <div className="space-y-8 animate-fade-in">
+                        <div className="aspect-video rounded-[2rem] overflow-hidden bg-black shadow-[0_40px_80px_rgba(0,0,0,0.8)] border border-white/10 relative group/video">
+                          <video src={videoUrl} controls autoPlay className="w-full h-full object-contain" />
+                          <div className="absolute top-6 right-6 z-20">
+                            <div className="premium-glass px-4 py-2 rounded-full border border-white/20 text-[10px] font-space font-bold uppercase tracking-widest text-white backdrop-blur-xl">
+                              4K Cinema Render
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-3 gap-6">
+                          {[
+                            { label: "Narrative Engine", value: "Gemini 2.0 Flash", icon: Sparkles },
+                            { label: "Audio Profile", value: "Cinematic AI Voice", icon: Mic },
+                            { label: "Render Tech", value: "Remotion Engine", icon: Film },
+                          ].map((stat, i) => (
+                            <div key={i} className="premium-glass p-5 rounded-3xl border border-white/5 flex items-center gap-4">
+                              <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/40">
+                                <stat.icon className="w-4 h-4" />
+                              </div>
+                              <div>
+                                <div className="text-[9px] text-white/30 uppercase font-bold tracking-widest">{stat.label}</div>
+                                <div className="text-xs font-bold text-white">{stat.value}</div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {intelMode === "geo-audit" && <GEOAuditResult data={intelResult} />}
+                    {intelMode === "design-dna" && <DesignDNAResult data={intelResult} />}
+                    {intelMode === "agent-research" && (
+                      <div className="animate-fade-in space-y-8">
+                        <div className="flex justify-between items-center">
+                          <h3 className="text-4xl font-space font-bold tracking-tight">Autonomous Brief</h3>
+                          <div className="premium-glass px-5 py-2 rounded-full border border-emerald-500/30 text-emerald-400 text-[10px] font-space font-bold uppercase tracking-widest">
+                            Deep Research Complete
+                          </div>
+                        </div>
+                        <div className="premium-glass p-10 rounded-[2.5rem] border border-white/5 bg-white/[0.01] relative overflow-hidden">
+                          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500/50 to-transparent"></div>
+                          <div className="text-white/70 leading-[1.8] font-light whitespace-pre-wrap text-lg italic">
+                            {intelResult}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {status === "error" && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-12">
+                    <div className="w-20 h-20 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mb-8">
+                      <AlertCircle className="w-8 h-8 text-rose-500" />
+                    </div>
+                    <h3 className="text-2xl font-space font-bold text-rose-500 mb-2 uppercase tracking-[0.2em]">Strategic Failure</h3>
+                    <p className="text-white/40 font-light max-w-sm mb-10 leading-relaxed">{error}</p>
+                    <button onClick={handleReset} className="px-8 py-3 rounded-full border border-white/10 text-[10px] font-space font-bold uppercase tracking-widest hover:bg-white/5 transition-colors">Reset Environment</button>
+                  </div>
+                )}
+              </div>
+
+              {/* Utility Toolbar */}
+              {status === "complete" && (
+                <div className="flex gap-4 animate-fade-in">
+                  <button className="flex-1 py-5 rounded-3xl premium-glass border border-white/10 hover:border-white/30 text-[11px] font-space font-bold uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3">
+                    <Download className="w-4 h-4 text-blue-400" />
+                    Export Strategic Package
+                  </button>
+                  <button className="flex-1 py-5 rounded-3xl premium-glass border border-white/10 hover:border-white/30 text-[11px] font-space font-bold uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 group">
+                    <Maximize2 className="w-4 h-4 text-gold-400 group-hover:scale-110 transition-transform" />
+                    Full Screen View
+                  </button>
+                  <button className="px-10 py-5 rounded-3xl bg-white text-black text-[11px] font-space font-bold uppercase tracking-[0.2em] hover:bg-gray-200 transition-all active:scale-95">
+                    Production Push
+                  </button>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </div>
     </div>
@@ -509,8 +628,16 @@ function StudioContent() {
 export default function StudioPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-white/30" />
+      <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center gap-6">
+        <div className="relative">
+          <div className="w-20 h-20 rounded-full border-2 border-white/5 animate-spin-slow"></div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-2 h-2 rounded-full bg-white animate-pulse"></div>
+          </div>
+        </div>
+        <span className="text-[10px] font-space font-bold uppercase tracking-[0.4em] text-white/30 animate-pulse">
+          Initializing Intelligence
+        </span>
       </div>
     }>
       <StudioContent />
