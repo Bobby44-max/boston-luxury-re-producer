@@ -23,7 +23,23 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 
-const SETTINGS_SECTIONS = [
+interface SettingItem {
+  label: string;
+  value: string;
+  action: string | null;
+  status?: string;
+}
+
+interface SettingSection {
+  title: string;
+  description: string;
+  icon: any;
+  color: string;
+  bg: string;
+  items: SettingItem[];
+}
+
+const SETTINGS_SECTIONS: SettingSection[] = [
   {
     title: "Profile Identity",
     description: "Core operator authentication and persona data",
