@@ -1,315 +1,267 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Link from "next/link";
+import React, { useRef } from "react";
+import Image from "next/image";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { useRouter } from "next/navigation";
-import {
+import { 
+  Building2, 
+  Sparkles, 
+  Layers, 
+  Camera, 
+  Mic, 
+  BrainCircuit,
+  ChevronDown,
   ArrowRight,
-  Play,
-  Sparkles,
-  Globe,
-  Wand2,
-  Film,
-  Clock,
-  CheckCircle2,
-  Loader2,
-  Volume2,
-  Zap,
+  TrendingUp,
+  FileText,
+  MessageSquare
 } from "lucide-react";
 
-const VIDEO_TYPES = [
+const slides = [
   {
-    id: "property-showcase",
-    name: "Property Showcase",
-    duration: "30s",
-    aspect: "16:9",
-    desc: "Cinematic property tour with AI voiceover",
+    id: "hero",
+    title: "Boston Luxury RE Producer",
+    subtitle: "The AI-powered content generation suite and architectural manual for Boston luxury real estate professionals.",
+    icon: <Building2 className="w-12 h-12 text-yellow-500 mb-6" style={{ color: "#D4AF37" }} />,
+    bg: "/assets/re-deck/re_hero_3d.png",
+    content: (
+      <div className="space-y-6 text-lg text-gray-200">
+        <p className="leading-relaxed font-light">
+          Proprietary Enterprise Software by Apex AI Technology.
+        </p>
+        <div className="flex gap-4 pt-4">
+          <button 
+            className="px-8 py-4 bg-white text-black font-space font-bold uppercase tracking-widest text-xs hover:bg-gray-200 transition-colors flex items-center gap-2"
+          >
+            Launch Studio <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    )
   },
   {
-    id: "social-short",
-    name: "Social Short",
-    duration: "9s",
-    aspect: "9:16",
-    desc: "TikTok & Reels optimized vertical",
+    id: "philosophy",
+    title: "The Content Suite Philosophy",
+    subtitle: "1 Topic = 6 Synchronized Assets",
+    icon: <Layers className="w-12 h-12 text-blue-400 mb-6" />,
+    bg: "/assets/re-deck/re_content_suite_3d.png",
+    content: (
+      <div className="space-y-6">
+        <p className="text-gray-300 leading-relaxed font-light">
+          Input a single market focus (e.g., 'Seaport luxury condos'). Automatically generate a synchronized, multi-channel campaign with zero manual formatting required.
+        </p>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6">
+          {[
+            { name: "Video Scripts", icon: <Camera className="w-4 h-4" /> },
+            { name: "Social Posts", icon: <MessageSquare className="w-4 h-4" /> },
+            { name: "Proposals", icon: <FileText className="w-4 h-4" /> },
+            { name: "Competitor Intel", icon: <TrendingUp className="w-4 h-4" /> },
+            { name: "Sales Materials", icon: <Layers className="w-4 h-4" /> },
+            { name: "VEO Prompts", icon: <Sparkles className="w-4 h-4" /> }
+          ].map((item) => (
+            <div key={item.name} className="premium-glass p-4 rounded-xl flex items-center gap-3 border border-white/10 hover:border-white/30 transition-colors">
+              <div className="text-blue-400">{item.icon}</div>
+              <span className="text-xs font-space font-bold uppercase tracking-wider text-white">{item.name}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
   },
   {
-    id: "just-listed",
-    name: "Just Listed",
-    duration: "12s",
-    aspect: "9:16",
-    desc: "New listing announcement",
+    id: "visual",
+    title: "Visual Storytelling",
+    subtitle: "Video & VEO Animator",
+    icon: <Camera className="w-12 h-12 text-rose-400 mb-6" />,
+    bg: "/assets/re-deck/re_visual_storytelling_3d.png",
+    content: (
+      <div className="space-y-6 mt-4">
+        <div className="bg-white/5 border border-white/10 p-5 rounded-2xl backdrop-blur-md">
+          <h4 className="text-rose-400 font-space font-bold uppercase text-sm mb-2">Nano Banana Pro Engine</h4>
+          <p className="text-sm text-gray-300 font-light">Utilizes Gemini 2.5 Flash Image capabilities to maintain strict property consistency across generated media.</p>
+        </div>
+        <div className="bg-white/5 border border-white/10 p-5 rounded-2xl backdrop-blur-md">
+          <h4 className="text-rose-400 font-space font-bold uppercase text-sm mb-2">Cinematic Camera Controls</h4>
+          <p className="text-sm text-gray-300 font-light">Prompts adhere to real-world filmmaking physics—apply "70mm lens," "dolly zoom," and "shallow depth of field" directly to showcases.</p>
+        </div>
+        <div className="bg-black/50 border border-white/10 p-4 rounded-xl font-mono text-xs text-rose-200">
+          {`{
+  "subject": "Luxury Seaport condo interior living room",
+  "lens": "70mm",
+  "camera_movement": "dolly zoom",
+  "depth_of_field": "shallow"
+}`}
+        </div>
+      </div>
+    )
   },
-];
-
-const WORKFLOW_STEPS = [
   {
-    icon: <Globe className="w-5 h-5" />,
-    title: "Paste URL",
-    desc: "Any Zillow, Redfin, or MLS link",
+    id: "consultant",
+    title: "The Live Consultant",
+    subtitle: "Real-time voice AI for ultra-high-net-worth clients",
+    icon: <Mic className="w-12 h-12 text-emerald-400 mb-6" />,
+    bg: "/assets/re-deck/re_live_consultant_3d.png",
+    content: (
+      <div className="space-y-6 mt-4">
+        <ul className="space-y-4">
+          <li className="flex items-start gap-4">
+            <div className="w-2 h-2 mt-2 rounded-full bg-emerald-400"></div>
+            <p className="text-gray-300 font-light">Powered by the <strong className="text-white">Gemini Live API</strong> for instantaneous, natural conversation latency.</p>
+          </li>
+          <li className="flex items-start gap-4">
+            <div className="w-2 h-2 mt-2 rounded-full bg-emerald-400"></div>
+            <p className="text-gray-300 font-light">Supports dynamic avatar video integration via the HeyGen API.</p>
+          </li>
+        </ul>
+        <div className="flex gap-4 pt-4">
+          <div className="premium-glass px-4 py-2 rounded-full border border-emerald-500/30 text-emerald-300 text-xs font-space uppercase tracking-widest font-bold">
+            Median Comp: $4.2M
+          </div>
+          <div className="premium-glass px-4 py-2 rounded-full border border-emerald-500/30 text-emerald-300 text-xs font-space uppercase tracking-widest font-bold">
+            Tax History Searched
+          </div>
+        </div>
+      </div>
+    )
   },
   {
-    icon: <Wand2 className="w-5 h-5" />,
-    title: "AI Extracts",
-    desc: "Photos, specs & description",
-  },
-  {
-    icon: <Sparkles className="w-5 h-5" />,
-    title: "Script Written",
-    desc: "Gemini crafts the narrative",
-  },
-  {
-    icon: <Film className="w-5 h-5" />,
-    title: "Video Rendered",
-    desc: "Cinema-grade Remotion output",
-  },
+    id: "engine",
+    title: "The AI Engine",
+    subtitle: "Why Gemini?",
+    icon: <BrainCircuit className="w-12 h-12 text-purple-400 mb-6" />,
+    bg: "/assets/re-deck/re_ai_engine_3d.png",
+    content: (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+        <div className="premium-glass p-6 rounded-2xl border border-white/10 group hover:border-purple-500/50 transition-colors">
+          <h4 className="text-purple-400 font-space font-bold uppercase text-sm mb-3">1-Million Token Context Window</h4>
+          <p className="text-sm text-gray-300 font-light leading-relaxed">
+            Process massive property histories, complex market comps, and decade-long tax records in a single interaction.
+          </p>
+        </div>
+        <div className="premium-glass p-6 rounded-2xl border border-white/10 group hover:border-purple-500/50 transition-colors">
+          <h4 className="text-purple-400 font-space font-bold uppercase text-sm mb-3">ReAct Agent Loop</h4>
+          <p className="text-sm text-gray-300 font-light leading-relaxed">
+            The internal reasoning engine autonomously decides when to query the filesystem, search the web, or answer directly.
+          </p>
+        </div>
+        <div className="premium-glass p-6 rounded-2xl border border-white/10 group hover:border-purple-500/50 transition-colors md:col-span-2">
+          <h4 className="text-purple-400 font-space font-bold uppercase text-sm mb-3">Multimodal Native</h4>
+          <p className="text-sm text-gray-300 font-light leading-relaxed">
+            Processes text, property images, audio, and code repositories simultaneously.
+          </p>
+        </div>
+      </div>
+    )
+  }
 ];
 
 export default function MarketingPage() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ container: containerRef });
   const router = useRouter();
-  const [url, setUrl] = useState("");
-  const [selectedType, setSelectedType] = useState("property-showcase");
-  const [isHovering, setIsHovering] = useState(false);
-
-  // Reveal animation
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("visible");
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    const revealElements = document.querySelectorAll(".reveal");
-    revealElements.forEach((el) => observer.observe(el));
-
-    return () => observer.disconnect();
-  }, []);
-
-  const handleGenerate = () => {
-    if (!url.trim()) return;
-    router.push(`/studio?url=${encodeURIComponent(url)}&type=${selectedType}`);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && url.trim()) {
-      handleGenerate();
-    }
-  };
 
   return (
-    <div className="min-h-screen bg-transparent">
-      {/* Hero Section */}
-      <section className="relative pt-36 pb-20 px-6">
-        <div className="max-w-3xl mx-auto text-center reveal">
-          {/* Status Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.03] border border-white/[0.06] mb-10">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-[11px] font-medium text-white/50 tracking-wide">
-              Remotion Video Engine · Live
-            </span>
-          </div>
-
-          {/* Headline */}
-          <h1 className="text-[3.5rem] md:text-[4.5rem] leading-[1.05] font-bold tracking-tight mb-6">
-            Listing URL to
-            <br />
-            <span className="gradient-gold-premium">Video in Minutes</span>
-          </h1>
-
-          {/* Subhead */}
-          <p className="text-lg text-white/40 max-w-lg mx-auto mb-12 leading-relaxed">
-            Paste any real estate listing. Get a professionally narrated,
-            beautifully rendered marketing video.
-          </p>
-
-          {/* URL Input */}
-          <div className="max-w-xl mx-auto mb-8">
-            <div
-              className={`relative rounded-2xl transition-all duration-300 ${
-                isHovering ? "bg-white/[0.04]" : "bg-white/[0.02]"
-              } border border-white/[0.06] hover:border-white/[0.12]`}
-              onMouseEnter={() => setIsHovering(true)}
-              onMouseLeave={() => setIsHovering(false)}
-            >
-              <div className="flex items-center">
-                <div className="pl-5">
-                  <Globe className="w-5 h-5 text-white/20" />
-                </div>
-                <input
-                  type="url"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Paste Zillow, Redfin, or any listing URL..."
-                  className="flex-1 bg-transparent py-5 px-4 text-[15px] text-white placeholder:text-white/25 focus:outline-none"
-                />
-                <button
-                  onClick={handleGenerate}
-                  disabled={!url.trim()}
-                  className={`m-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all flex items-center gap-2 ${
-                    url.trim()
-                      ? "bg-white text-black hover:bg-white/90"
-                      : "bg-white/10 text-white/30 cursor-not-allowed"
-                  }`}
-                >
-                  Generate
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Video Type Pills */}
-          <div className="flex flex-wrap justify-center gap-2 mb-12">
-            {VIDEO_TYPES.map((type) => (
-              <button
-                key={type.id}
-                onClick={() => setSelectedType(type.id)}
-                className={`px-4 py-2 rounded-full text-[13px] font-medium transition-all ${
-                  selectedType === type.id
-                    ? "bg-white/10 text-white border border-white/20"
-                    : "text-white/40 hover:text-white/60 border border-transparent"
-                }`}
-              >
-                {type.name}
-                <span className="ml-1.5 text-white/30">{type.duration}</span>
-              </button>
-            ))}
-          </div>
-
-          {/* Trust Row */}
-          <div className="flex items-center justify-center gap-8 text-[13px] text-white/30">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-500/70" />
-              <span>No watermarks</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4" />
-              <span>~2 min render</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Zap className="w-4 h-4" />
-              <span>4K quality</span>
-            </div>
-          </div>
+    <div 
+      ref={containerRef}
+      className="h-screen w-full overflow-y-auto snap-y snap-mandatory bg-[#050505] text-white scroll-smooth selection:bg-yellow-500/30 selection:text-yellow-200"
+    >
+      {/* Navigation Branding */}
+      <div className="fixed top-8 left-8 z-50 flex items-center gap-4 cursor-pointer" onClick={() => router.push('/studio')}>
+        <div className="w-12 h-12 premium-glass rounded-2xl flex items-center justify-center border border-white/10 shadow-2xl">
+          <Building2 className="w-6 h-6 text-white" />
         </div>
-      </section>
-
-      {/* Workflow Steps */}
-      <section className="py-20 px-6 reveal">
-        <div className="max-w-3xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {WORKFLOW_STEPS.map((step, i) => (
-              <div
-                key={i}
-                className="relative p-5 rounded-2xl bg-white/[0.02] border border-white/[0.05] group hover:border-white/[0.1] transition-all"
-              >
-                <div className="w-10 h-10 rounded-xl bg-white/[0.05] flex items-center justify-center mb-4 text-white/40 group-hover:text-white/60 transition-colors">
-                  {step.icon}
-                </div>
-                <div className="text-[10px] font-bold text-white/20 tracking-widest mb-1.5">
-                  STEP {i + 1}
-                </div>
-                <div className="font-semibold text-sm mb-1">{step.title}</div>
-                <div className="text-xs text-white/30">{step.desc}</div>
-              </div>
-            ))}
-          </div>
+        <div className="flex flex-col">
+          <span className="font-space font-bold tracking-[0.2em] text-sm uppercase text-white">RE Producer</span>
+          <span className="text-[10px] uppercase tracking-widest text-white/40">Boston Luxury</span>
         </div>
-      </section>
+      </div>
 
-      {/* Video Types Section */}
-      <section className="py-20 px-6 border-t border-white/[0.04] reveal">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold tracking-tight mb-3">
-              Choose Your Format
-            </h2>
-            <p className="text-white/40">
-              Optimized for every platform
-            </p>
+      {/* Global Actions */}
+      <div className="fixed top-8 right-8 z-50 flex items-center gap-4">
+        <button 
+          onClick={() => router.push('/studio')}
+          className="premium-glass px-6 py-3 rounded-full border border-white/20 text-xs font-space font-bold uppercase tracking-widest hover:bg-white hover:text-black transition-colors"
+        >
+          Open Studio
+        </button>
+      </div>
+
+      {/* Scroll Indicator */}
+      <motion.div 
+        className="fixed bottom-12 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-3"
+        style={{ opacity: useTransform(scrollYProgress, [0, 0.05], [1, 0]) }}
+      >
+        <span className="text-[10px] uppercase tracking-[0.3em] text-white/50 font-bold">Scroll to Explore</span>
+        <div className="w-px h-12 bg-gradient-to-b from-white/40 to-transparent"></div>
+        <ChevronDown className="w-4 h-4 text-white/40 animate-bounce" />
+      </motion.div>
+
+      {slides.map((slide, index) => (
+        <section 
+          key={slide.id} 
+          className="h-screen w-full snap-start relative flex items-center justify-center overflow-hidden"
+        >
+          {/* High-End Cinematic Background */}
+          <div className="absolute inset-0 z-0">
+            <Image 
+              src={slide.bg} 
+              alt={slide.title} 
+              fill 
+              className="object-cover opacity-60 scale-105"
+              priority={index === 0}
+            />
+            {/* Cinematic Gradient Overlays */}
+            <div className="absolute inset-0 bg-gradient-to-b from-[#050505]/90 via-transparent to-[#050505]"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-[#050505]/80 via-[#050505]/40 to-transparent"></div>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-4">
-            {VIDEO_TYPES.map((type) => (
-              <div
-                key={type.id}
-                className="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:border-white/[0.1] transition-all group"
-              >
-                <div className="flex items-center justify-between mb-5">
-                  <div
-                    className={`w-11 h-11 rounded-xl flex items-center justify-center ${
-                      type.aspect === "16:9"
-                        ? "bg-indigo-500/10 text-indigo-400"
-                        : "bg-amber-500/10 text-amber-400"
-                    }`}
-                  >
-                    <Film className="w-5 h-5" />
-                  </div>
-                  <span className="text-[11px] font-mono text-white/20">
-                    {type.aspect}
-                  </span>
-                </div>
-                <h3 className="font-bold mb-1.5">{type.name}</h3>
-                <p className="text-sm text-white/30 mb-4">{type.desc}</p>
-                <div className="flex items-center gap-2 text-xs text-white/40">
-                  <Clock className="w-3.5 h-3.5" />
-                  {type.duration}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Tech Stack */}
-      <section className="py-20 px-6 border-t border-white/[0.04] reveal">
-        <div className="max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-6 px-8 py-4 rounded-2xl bg-white/[0.02] border border-white/[0.05]">
-            <span className="text-xs font-medium text-white/30">Powered by</span>
-            <div className="flex items-center gap-4 text-sm font-medium text-white/50">
-              <span>Firecrawl</span>
-              <span className="text-white/10">·</span>
-              <span>Gemini</span>
-              <span className="text-white/10">·</span>
-              <span>OpenAI TTS</span>
-              <span className="text-white/10">·</span>
-              <span>Remotion</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-24 px-6 border-t border-white/[0.04] reveal">
-        <div className="max-w-xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
-            Ready to Create?
-          </h2>
-          <p className="text-white/40 mb-8">
-            Transform your next listing into cinema.
-          </p>
-          <Link
-            href="/studio"
-            className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black font-semibold rounded-xl hover:bg-white/90 transition-all"
+          {/* Glassmorphic Content Card */}
+          <motion.div 
+            initial={{ opacity: 0, y: 50, filter: "blur(10px)" }}
+            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
+            viewport={{ once: false, amount: 0.5 }}
+            className="relative z-10 max-w-5xl w-full mx-8 md:mx-16"
           >
-            <Play className="w-4 h-4" />
-            Open Studio
-          </Link>
-        </div>
-      </section>
+            <div className="max-w-2xl">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3, duration: 0.8 }}
+              >
+                {slide.icon}
+                <h2 className="text-5xl md:text-7xl lg:text-[5.5rem] font-space font-bold tracking-tighter mb-4 text-white leading-[0.95]">
+                  {slide.title}
+                </h2>
+                <h4 className="text-xl md:text-2xl text-white/70 font-space font-medium mb-10 tracking-tight max-w-xl">
+                  {slide.subtitle}
+                </h4>
+              </motion.div>
+              
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.8 }}
+                className="relative"
+              >
+                {slide.content}
+              </motion.div>
+            </div>
 
-      {/* Footer */}
-      <footer className="py-10 px-6 border-t border-white/[0.04]">
-        <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-white/20">
-          <span>&copy; 2026 Apex Luxury Intelligence Suite</span>
-          <span>Real Estate Video Generation</span>
-        </div>
-      </footer>
+            {/* Pagination Number */}
+            <div className="absolute top-0 right-0 font-space font-bold text-[10rem] md:text-[14rem] text-white/[0.02] leading-none pointer-events-none select-none">
+              {String(index + 1).padStart(2, '0')}
+            </div>
+          </motion.div>
+        </section>
+      ))}
+
+      {/* Global Progress Bar */}
+      <motion.div 
+        className="fixed bottom-0 left-0 h-1 bg-gradient-to-r from-yellow-600 via-yellow-500 to-amber-400 z-50 origin-left"
+        style={{ scaleX: scrollYProgress, backgroundColor: "#D4AF37" }}
+      />
     </div>
   );
 }

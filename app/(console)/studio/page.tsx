@@ -1,18 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   Globe,
   Loader2,
   Sparkles,
-  Play,
   Download,
   CheckCircle2,
   AlertCircle,
   Film,
-  Clock,
-  Volume2,
   Wand2,
   RefreshCw,
 } from "lucide-react";
@@ -80,7 +77,7 @@ const GEOAuditResult = ({ data }: { data: any }) => (
         <h3 className="text-lg font-bold text-accent-indigo mb-1">GEO Citability Score</h3>
         <p className="text-sm text-white/50">How effectively AI models can cite this content</p>
       </div>
-      <div className="text-4xl font-black text-accent-indigo">{data.citatonScore}%</div>
+      <div className="text-4xl font-black text-accent-indigo">{data.citationScore}%</div>
     </div>
 
     <div className="grid md:grid-cols-2 gap-4">
@@ -170,7 +167,7 @@ const DesignDNAResult = ({ data }: { data: any }) => (
   </div>
 );
 
-export default function StudioPage() {
+function StudioContent() {
   const searchParams = useSearchParams();
 
   const [url, setUrl] = useState(searchParams.get("url") || "");
@@ -194,23 +191,24 @@ export default function StudioPage() {
       try {
         const response = await fetch(`/api/video/status?id=${jobId}`);
         const data = await response.json();
+        const job = data.job;
 
-        if (data.status) {
-          setStatus(data.status as JobStatus);
-          setProgress(data.progress || STATUS_PROGRESS[data.status as JobStatus]);
+        if (job?.status) {
+          setStatus(job.status as JobStatus);
+          setProgress(job.progress || STATUS_PROGRESS[job.status as JobStatus]);
         }
 
-        if (data.propertyData) {
-          setPropertyData(data.propertyData);
+        if (job?.propertyData) {
+          setPropertyData(job.propertyData);
         }
 
-        if (data.status === "complete" && data.videoUrl) {
-          setVideoUrl(data.videoUrl);
+        if (job?.status === "complete" && job.videoUrl) {
+          setVideoUrl(job.videoUrl);
           clearInterval(pollInterval);
         }
 
-        if (data.status === "error" || data.error) {
-          setError(data.error || "An error occurred");
+        if (job?.status === "error" || job?.error) {
+          setError(job.error || "An error occurred");
           setStatus("error");
           clearInterval(pollInterval);
         }
@@ -505,5 +503,17 @@ export default function StudioPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function StudioPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-white/30" />
+      </div>
+    }>
+      <StudioContent />
+    </Suspense>
   );
 }

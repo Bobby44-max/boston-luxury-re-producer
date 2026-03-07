@@ -35,7 +35,7 @@ export async function generateVideoScript(
   options: ScriptOptions
 ): Promise<VideoScript> {
   const genAI = getGeminiClient();
-  const model = genAI.getGenerativeModel({ model: 'gemini-3-pro-preview' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
   const prompt = buildScriptPrompt(property, options);
 
@@ -167,7 +167,7 @@ export async function reason(
 
 // Blueprint B: Design DNA Cloner
 // Extracts CSS variables, palette, and typography for Shadcn implementation
-export async function extractDesignDNA(url: string, brandingData: any) {
+export async function extractDesignDNA(url: string, brandingData: Record<string, unknown>) {
   const systemPrompt = `
 You are an elite UI Engineer and Design System Architect.
 Your goal is to extract the "Design DNA" from a website's raw branding data.
@@ -221,7 +221,7 @@ Content: ${markdown.slice(0, 30000)}
 
 Provide a detailed GEO Audit in JSON format:
 {
-  "citatonScore": 0-100,
+  "citationScore": 0-100,
   "optimizationOpportunities": [
     { "area": "Entity Definition", "fix": "..." },
     { "area": "Information Gain", "fix": "..." }

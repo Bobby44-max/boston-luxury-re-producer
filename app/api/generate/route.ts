@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // ==================== KNOWLEDGE BASE ====================
@@ -45,7 +46,7 @@ async function generateWithGemini(prompt: string): Promise<string> {
   // Note: Google Search Grounding is incompatible with JSON response mode
   // Using standard generation with JSON output
   const model = genAI.getGenerativeModel({
-    model: "gemini-3-pro-preview",
+    model: "gemini-2.0-flash",
   });
 
   const result = await model.generateContent({
@@ -64,6 +65,11 @@ async function generateWithGemini(prompt: string): Promise<string> {
 
 export async function POST(request: NextRequest) {
   try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await request.json();
     const { tool, ...params } = body;
 

@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { 
-  scrapeProperty, 
-  scrapeInsights, 
-  scrapeAdvanced, 
+import {
+  scrapeProperty,
+  scrapeInsights,
+  scrapeAdvanced,
   runIntelligenceAgent,
-  type Property, 
-  type Insights 
 } from '@/lib/services/firecrawl';
 import { runGEOAudit, extractDesignDNA } from '@/lib/services/gemini';
 
@@ -26,26 +24,27 @@ export async function POST(request: NextRequest) {
     }
 
     // Handle different intelligence types
-    let result: any;
+    let result: unknown;
 
     switch (type) {
       case 'property':
         result = await scrapeProperty(url);
         break;
-      
+
       case 'insights':
         result = await scrapeInsights(url);
         break;
 
       case 'geo-audit': {
         const scrape = await scrapeAdvanced(url, { formats: ['markdown'] });
-        result = await runGEOAudit(url, (scrape as any).markdown || '');
+        result = await runGEOAudit(url, scrape.markdown || '');
         break;
       }
 
       case 'design-dna': {
-        const scrape = await scrapeAdvanced(url, { formats: ['branding', 'screenshot'] });
-        result = await extractDesignDNA(url, (scrape as any).branding || {});
+        // Scrape markdown + screenshot, then pass to Gemini for design extraction
+        const scrape = await scrapeAdvanced(url, { formats: ['markdown', 'screenshot'] });
+        result = await extractDesignDNA(url, { markdown: scrape.markdown, screenshot: scrape.screenshot });
         break;
       }
 

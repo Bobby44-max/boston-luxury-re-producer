@@ -17,7 +17,7 @@ export async function POST() {
   try {
     // Request ephemeral token from Google (Standardized 2026 Live API)
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateEphemeralToken?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-live-001:generateEphemeralToken?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -55,7 +55,7 @@ Keep responses concise, premium, and high-trust. Use your "smart older sister" e
       // In production, you'd want proper ephemeral token support
       return NextResponse.json({
         token: apiKey,
-        model: "gemini-3-flash-preview",
+        model: "gemini-2.0-flash-live-001",
         fallback: true,
       });
     }
@@ -65,7 +65,7 @@ Keep responses concise, premium, and high-trust. Use your "smart older sister" e
     return NextResponse.json({
       token: data.token || data.ephemeralToken,
       expiresAt: data.expiresAt,
-      model: "gemini-3-flash-preview",
+      model: "gemini-2.0-flash-live-001",
     });
   } catch (error) {
     console.error("Token generation error:", error);
@@ -73,7 +73,7 @@ Keep responses concise, premium, and high-trust. Use your "smart older sister" e
     // Fallback to API key
     return NextResponse.json({
       token: apiKey,
-      model: "gemini-3-flash-preview",
+      model: "gemini-2.0-flash-live-001",
       fallback: true,
     });
   }

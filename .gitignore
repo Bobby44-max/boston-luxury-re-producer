@@ -40,6 +40,10 @@ Thumbs.db
 
 .vercel
 
+# MCP
+.mcp.json
+.claude/
+
 # Convex
 convex/_generated
 convex/README.md

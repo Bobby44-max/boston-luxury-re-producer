@@ -21,6 +21,8 @@ export default {
           orange: "#f97316",
           pink: "#ec4899",
           green: "#22c55e",
+          indigo: "#6366f1",
+          rose: "#f43f5e",
         },
       },
       fontFamily: {

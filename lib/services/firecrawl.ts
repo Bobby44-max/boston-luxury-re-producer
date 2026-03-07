@@ -185,33 +185,50 @@ export function getHighResImage(url: string): string {
 
 // Advanced extraction options for Web Intelligence
 export interface ScrapeOptions {
-  formats?: ('markdown' | 'html' | 'rawHtml' | 'screenshot' | 'links' | 'summary' | 'branding')[];
+  formats?: ('markdown' | 'html' | 'rawHtml' | 'screenshot' | 'links')[];
   maxAge?: number; // Caching in seconds
   waitFor?: number;
   onlyMainContent?: boolean;
 }
 
+// Extended response type for Firecrawl scrape results
+export interface ScrapeResult {
+  success: boolean;
+  markdown?: string;
+  html?: string;
+  rawHtml?: string;
+  screenshot?: string;
+  links?: string[];
+  error?: string;
+  [key: string]: unknown;
+}
+
+// Intelligence agent response
+export interface AgentResult {
+  answer?: string;
+  sources?: { url: string; title?: string }[];
+  [key: string]: unknown;
+}
+
 // Scrape website with high-fidelity intelligence formats
-export async function scrapeAdvanced(url: string, options: ScrapeOptions = {}) {
+export async function scrapeAdvanced(url: string, options: ScrapeOptions = {}): Promise<ScrapeResult> {
   const firecrawl = getFirecrawlClient();
-  const { 
-    formats = ['markdown', 'branding', 'screenshot'], 
-    maxAge = 3600, // 1 hour cache default
-    onlyMainContent = true 
+  const {
+    formats = ['markdown', 'screenshot'],
+    onlyMainContent = true
   } = options;
 
   try {
     const result = await firecrawl.scrapeUrl(url, {
-      formats: formats as any,
+      formats,
       onlyMainContent,
-      actions: [], // Can add scroll/click actions here
     });
 
     if (!result.success) {
       throw new Error(`Firecrawl scrape failed: ${result.error}`);
     }
 
-    return result;
+    return result as unknown as ScrapeResult;
   } catch (error) {
     console.error('Firecrawl advanced scrape error:', error);
     throw error;
@@ -254,9 +271,12 @@ export function selectBestImages(images: string[], count: number = 10): string[]
 }
 
 // Firecrawl Agent Mode for complex multi-step research
-export async function runIntelligenceAgent(prompt: string, schema?: any) {
+export async function runIntelligenceAgent(prompt: string, schema?: Record<string, unknown>): Promise<AgentResult> {
   const apiKey = process.env.FIRECRAWL_API_KEY;
-  
+  if (!apiKey) {
+    throw new Error('FIRECRAWL_API_KEY not configured');
+  }
+
   // Note: Using fetch directly as the JS SDK might not support /agent yet
   const response = await fetch('https://api.firecrawl.dev/v1/agent', {
     method: 'POST',
@@ -267,7 +287,6 @@ export async function runIntelligenceAgent(prompt: string, schema?: any) {
     body: JSON.stringify({
       prompt,
       schema,
-      model: 'spark-1-pro' // Recommended for frontier accuracy
     })
   });
 
@@ -276,5 +295,5 @@ export async function runIntelligenceAgent(prompt: string, schema?: any) {
     throw new Error(`Firecrawl Agent Error: ${err}`);
   }
 
-  return response.json();
+  return response.json() as Promise<AgentResult>;
 }
