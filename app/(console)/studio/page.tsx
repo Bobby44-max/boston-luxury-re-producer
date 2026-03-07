@@ -18,7 +18,8 @@ import {
   Zap,
   Layout,
   Search,
-  Maximize2
+  Maximize2,
+  Mic
 } from "lucide-react";
 
 const INTELLIGENCE_MODES = [
